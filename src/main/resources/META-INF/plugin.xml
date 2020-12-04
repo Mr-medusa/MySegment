@@ -1,0 +1,44 @@
+<idea-plugin>
+    <id>red.medusa.MySegment</id>
+    <name>MySegment</name>
+    <vendor email="medusa@myemail.com" url="https://www.medusa.red">Github</vendor>
+
+    <description><![CDATA[
+        <h3>"云"·笔记插件</h3>
+        <p>一个基于 IntelliJ IDEA 插件平台 + Github 开发的 "云"· 笔记插件</p>
+        <h4>使用</h4>
+        <ul>
+          <li>本地使用: 在 File|settings|Segment DB Settings 中配置 Local save dir</li>
+          <li>远程仓库: 依赖上一步,在 File|Settings|Tools|Segment DB Settings 中配置勾选 Use Github,配置 Github url仓库地址</li>
+          <li>自动提交: 在 File|Settings|Tools|Segment DB Settings 勾选 autoCommit</li>
+          <li>自动推送: 在 File|Settings|Tools|Segment DB Settings 勾选 autoPush</li>
+        </ul>
+        <p>注意: 仅拉取时可以使用 https,但是自动 push 为使用 ssh,因此需要配置公钥放到远程仓库</p>
+]]></description>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html on how to target different products -->
+    <!-- uncomment to enable plugin in all products -->
+    <depends>com.intellij.modules.platform</depends>
+
+    <applicationListeners>
+        <listener class="red.medusa.intellij.listener.ProjectOpenCloseListener"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    </applicationListeners>
+
+    <extensions defaultExtensionNs="com.intellij">
+
+        <toolWindow id="Segment"
+                    secondary="true"
+                    anchor="right"
+                    canCloseContents="false"
+                    factoryClass="red.medusa.intellij.ui.SegmentToolWindowFactory"/>
+
+        <!-- settings       -->
+        <applicationConfigurable parentId="tools" instance="red.medusa.intellij.settings.AppSettingsConfigurable"
+                                 id="org.intellij.sdk.settings.AppSettingsConfigurable"
+                                 displayName="Segment DB Settings"/>
+
+        <applicationService serviceImplementation="red.medusa.intellij.settings.AppSettingsState"/>
+
+    </extensions>
+</idea-plugin>
