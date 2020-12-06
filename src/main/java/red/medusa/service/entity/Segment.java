@@ -17,8 +17,9 @@ import java.util.Set;
 @Entity
 @DynamicUpdate
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
+@SuppressWarnings("all")
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class Segment extends BaseEntity {
     private String name;
     @Column(length = 1000)
