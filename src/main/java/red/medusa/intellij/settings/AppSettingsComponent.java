@@ -70,7 +70,7 @@ public class AppSettingsComponent {
         checkBox.add(autoPushStatus);
 
         try {
-            Set<String> allBranch = SegmentGithubService.getInstance().getAllLocalBranch();
+            Set<String> allBranch = SegmentGithubService.getInstance().findLocalBranchNames();
             for (String branch : allBranch) {
                 branchNames.addItem(branch);
             }
@@ -209,7 +209,7 @@ public class AppSettingsComponent {
             SegmentGithubService instance = SegmentGithubService.getInstance();
 
             if (instance.hasLocalRepo()) {
-                Set<String> allBranch = instance.getAllLocalBranch();
+                Set<String> allBranch = instance.findLocalBranchNames();
                 String currentBranch = instance.getCurrentBranch();
                 branchNames.removeAllItems();
                 if (allBranch.isEmpty()) {

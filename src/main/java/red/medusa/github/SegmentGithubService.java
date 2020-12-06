@@ -2,14 +2,12 @@ package red.medusa.github;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
 import org.eclipse.jgit.dircache.DirCache;
-import org.eclipse.jgit.lib.Config;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -24,7 +22,6 @@ import red.medusa.utils.StringUtils;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 /**
  * @author huguanghui
@@ -91,8 +88,8 @@ public class SegmentGithubService {
             NotifyUtils.notifyWarning(HELP_TITLE, "没有添加的初始化仓库配置项", HELP_URL);
             e1.printStackTrace();
         } catch (RefAlreadyExistsException e2) {    // checkout
-             e2.printStackTrace();
-             NotifyUtils.notifyWarning(HELP_TITLE, "请检出本地有效的分支路径!", HELP_URL);
+            e2.printStackTrace();
+            NotifyUtils.notifyWarning(HELP_TITLE, "请检出本地有效的分支路径!", HELP_URL);
         } catch (Exception error) {
             NotifyUtils.notifyWarning(HELP_TITLE, error.getMessage(), HELP_URL);
             error.printStackTrace();
@@ -141,27 +138,9 @@ public class SegmentGithubService {
     public Set<String> getAllBranchForTest(String githubUrl) throws Exception {
         return runInSpecialClassLoader(
                 () -> {
-                    Set<String> branchNameResult = new LinkedHashSet<>();
+                    Set<String> branchNameResult = findLocalBranchNames();
 
-                    if (hasLocalRepo()) {
-                        Git git = Git.wrap(openLocalRepository());
-                        ListBranchCommand branchCommand = git.branchList();
-                        List<String> branchNames = branchCommand
-                                .setListMode(ListBranchCommand.ListMode.ALL)
-                                .call()
-                                .stream()
-                                .map(Ref::getName)
-                                .collect(Collectors.toList());
-
-                        branchNameResult.addAll(branchNames);
-                    }
-
-                    LsRemoteCommand lsRemoteCommand = Git.lsRemoteRepository();
-                    lsRemoteCommand.setRemote(githubUrl);
-                    final Map<String, Ref> map = lsRemoteCommand.setHeads(true).callAsMap();
-                    for (Map.Entry<String, Ref> entry : map.entrySet()) {
-                        branchNameResult.add(entry.getKey());
-                    }
+                    branchNameResult.addAll(findRemoteBranchNames(githubUrl));
 
                     if (branchNameResult.isEmpty())
                         branchNameResult.add(AppSettingsState.DEFAULT_BRANCH_NAME);
@@ -169,28 +148,6 @@ public class SegmentGithubService {
                     log.info("all local branch name has : {}", branchNameResult.toString());
 
                     return branchNameResult;
-                });
-    }
-
-    /*
-        不连接远程仓库获得所有分支
-     */
-    public Set<String> getAllLocalBranch() throws Exception {
-        return runInSpecialClassLoader(
-                () -> {
-                    if (hasLocalRepo()) {
-                        Git git = Git.wrap(openLocalRepository());
-                        ListBranchCommand branchCommand = git.branchList();
-                        Set<String> branchNames = branchCommand
-                                .setListMode(ListBranchCommand.ListMode.ALL)
-                                .call()
-                                .stream()
-                                .map(Ref::getName)
-                                .collect(Collectors.toSet());
-                        log.info("all local branch name has : {}", branchNames.toString());
-                        return branchNames;
-                    }
-                    return new HashSet<>(Collections.singleton(AppSettingsState.DEFAULT_BRANCH_NAME));
                 });
     }
 
@@ -375,61 +332,35 @@ public class SegmentGithubService {
 
 
     //------------------------------------------------------------------------------------
-
-    /*
-        暂时没有用到的方法
-     */
-    private Set<String> findRemoteUrlOfLocalRepo() throws Exception {
+    public Set<String> findRemoteBranchNames(String githubUrl) throws Exception {
         return this.runInSpecialClassLoader(() -> {
-            Set<String> remoteUrls = new HashSet<>();
-            if (this.hasLocalRepo()) {
-                Config storedConfig = git.getRepository().getConfig();
-                Set<String> remotes = storedConfig.getSubsections("remote");
-                for (String remoteName : remotes) {
-                    remoteUrls.add(storedConfig.getString("remote", remoteName, "url"));
-                }
-            }
-            return remoteUrls;
-        });
-    }
-
-    public Set<String> findRemoteBranches() throws GitAPIException {
-        if (settings.githubUrl != null && !settings.githubUrl.trim().isEmpty()) {
             LsRemoteCommand lsRemoteCommand = Git.lsRemoteRepository();
-            lsRemoteCommand.setRemote(settings.githubUrl);
+            lsRemoteCommand.setRemote(githubUrl);
             final Map<String, Ref> map = lsRemoteCommand.setHeads(true).callAsMap();
             Set<String> branchNames = new LinkedHashSet<>();
             for (Map.Entry<String, Ref> entry : map.entrySet()) {
                 branchNames.add(entry.getKey());
             }
             return branchNames;
+        });
+    }
+
+    public Set<String> findLocalBranchNames() throws Exception {
+        if (settings.localSavePosition != null && !settings.localSavePosition.trim().isEmpty()) {
+            return this.runInSpecialClassLoader(() -> {
+                String prefix = "refs/heads/";
+                Set<String> localhostBranchNames = new LinkedHashSet<>();
+                File file = new File(settings.localSavePosition + "/.git/refs/heads");
+                if (file.exists()) {
+                    for (String fileName : Objects.requireNonNull(file.list())) {
+                        localhostBranchNames.add(prefix + fileName);
+                    }
+                }
+                return localhostBranchNames;
+            });
         } else {
-            return Collections.EMPTY_SET;
+            return new LinkedHashSet<>(Collections.singleton(AppSettingsState.DEFAULT_BRANCH_NAME));
         }
-    }
-
-    public List<String> getRemoteBranch() throws Exception {
-        return runInSpecialClassLoader(
-                () -> {
-                    ListBranchCommand branchCommand = git.branchList();
-                    branchCommand.setListMode(ListBranchCommand.ListMode.REMOTE);
-                    List<String> branchNames = branchCommand.call()
-                            .stream()
-                            .map(Ref::getName)
-                            .collect(Collectors.toList());
-                    log.info("all branch name has : {}", branchNames.toString());
-                    return branchNames;
-                });
-    }
-
-    public boolean localBranchHasAlreadyExits(String branchName) {
-        File file = new File(settings.localSavePosition + "/.git/refs/heads");
-        if (file.exists()) {
-            for (String fileName : Objects.requireNonNull(file.list())) {
-                return branchName.equals(fileName);
-            }
-        }
-        return false;
     }
 }
 
