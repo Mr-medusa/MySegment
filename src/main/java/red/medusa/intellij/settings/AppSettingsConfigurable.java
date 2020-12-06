@@ -57,7 +57,6 @@ public class AppSettingsConfigurable implements Configurable {
         settings.autoCommit = mySettingsComponent.getAutoCommitStatus();
         settings.autoPush = mySettingsComponent.getAutoPushStatus();
         settings.branchName = mySettingsComponent.getBranchName();
-
         /*
             配置仓库
          */

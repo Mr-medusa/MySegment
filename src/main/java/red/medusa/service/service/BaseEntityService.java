@@ -62,7 +62,7 @@ public abstract class BaseEntityService {
 
     public <T extends BaseEntity> Integer delete(T t) {
         log.info("delete : class = {},value = {}", t.getClass(), t);
-        if(t.getId() == null)
+        if (t.getId() == null)
             return 0;
         EntityManager entityManager = this.begin();
         // 可能是一个游离对象,先改成持久对象再删除
@@ -97,6 +97,8 @@ public abstract class BaseEntityService {
         lifetime
      */
     public void startService() {
+        if (emf != null && emf.isOpen())
+            finishService();
         String dbUrl = dbUrl();
         log.info("MySegment will create db file at {}", dbUrl);
         Map<String, String> map = new HashMap<>(1);
@@ -113,17 +115,19 @@ public abstract class BaseEntityService {
     }
 
     public void finishService() {
-        log.info("MySegment EntityManagerFactory is finishing...");
-        readEntityManager.close();
-        emf.close();
-        log.info("MySegment EntityManagerFactory service is open = {}", emf.isOpen());
+        if (emf != null && emf.isOpen()) {
+            log.info("MySegment EntityManagerFactory is finishing...");
+            readEntityManager.close();
+            emf.close();
+            log.info("MySegment EntityManagerFactory service is open = {}", emf.isOpen());
+        }
     }
 
     /*
         动态切换DB
      */
     public void recreateEntityManagerFactory() {
-        if(emf==null){
+        if (emf == null || !emf.isOpen()) {
             startService();
         }
         Map<String, Object> properties = emf.getProperties();

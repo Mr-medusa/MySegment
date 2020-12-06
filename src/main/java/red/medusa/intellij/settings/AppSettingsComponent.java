@@ -19,7 +19,7 @@ import red.medusa.ui.NotifyUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author huguanghui
@@ -70,7 +70,7 @@ public class AppSettingsComponent {
         checkBox.add(autoPushStatus);
 
         try {
-            List<String> allBranch = SegmentGithubService.getInstance().getAllBranch();
+            Set<String> allBranch = SegmentGithubService.getInstance().getAllLocalBranch();
             for (String branch : allBranch) {
                 branchNames.addItem(branch);
             }
@@ -174,10 +174,11 @@ public class AppSettingsComponent {
             String text = githubUrlText.getText();
             if (text != null && text.trim().length() > 0) {
                 TestGithubUrlResult testResult = SegmentGithubService.getInstance().testRemoteUrlAvailability(text);
+
                 if (testResult.isUrlAvailability) {
                     this.testGithubUrlResult.setText("<html><font color=green>Successful</span></html>");
                     this.branchNames.removeAllItems();
-                    List<String> branchNames = testResult.getBranchNames();
+                    Set<String> branchNames = testResult.getBranchNames();
                     int i = 0;
                     boolean find = false;
                     AppSettingsState settingsState = AppSettingsState.getInstance();
@@ -208,7 +209,7 @@ public class AppSettingsComponent {
             SegmentGithubService instance = SegmentGithubService.getInstance();
 
             if (instance.hasLocalRepo()) {
-                List<String> allBranch = instance.getAllBranch();
+                Set<String> allBranch = instance.getAllLocalBranch();
                 String currentBranch = instance.getCurrentBranch();
                 branchNames.removeAllItems();
                 if (allBranch.isEmpty()) {
@@ -239,7 +240,7 @@ public class AppSettingsComponent {
     @AllArgsConstructor
     public static class TestGithubUrlResult {
         private boolean isUrlAvailability;
-        private List<String> branchNames;
+        private Set<String> branchNames;
     }
 }
 
