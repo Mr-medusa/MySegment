@@ -2,6 +2,7 @@ package red.medusa.ui.controls.listener;
 
 import com.intellij.ui.EditorTextField;
 import red.medusa.service.entity.LangType;
+import red.medusa.ui.SegmentAddOrEdit;
 import red.medusa.ui.context.SegmentContextHolder;
 import red.medusa.ui.controls.SegmentEditorTextField;
 
@@ -23,6 +24,9 @@ public class DependenceSyntaxComboListener implements ItemListener ,DebounceWork
     public void itemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED) {
             LangType langType = (LangType) e.getItem();
+            if(langType.value.equals(SegmentAddOrEdit.COMBOBOX_FIRST_SELECT)){
+                return;
+            }
             dependenceTextArea.setFileType(SegmentEditorTextField.findFileType(langType.name()));
 
             SegmentContextHolder.getSegment().setLangDep(langType);

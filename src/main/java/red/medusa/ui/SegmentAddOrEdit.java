@@ -70,6 +70,7 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
     /*
         layout
      */
+    public final static String COMBOBOX_FIRST_SELECT = " -请选择- ";
     // 名字
     private final Box nameBox = Box.createHorizontalBox();
     // 模块版本
@@ -241,14 +242,16 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
          */
         moduleComboBox.removeAllItems();
         versionComboBox.removeAllItems();
+        moduleComboBox.addItem(new Module().setName(COMBOBOX_FIRST_SELECT));
+        versionComboBox.addItem(new Version().setName(COMBOBOX_FIRST_SELECT));
         List<Module> modules = new ModuleAction().list();
-        int i = 0;
+        int i = 1;
         for (Module module : modules) {
             moduleComboBox.addItem(module);
             if (segment.getId() != null && segment.getModule().getId().equals(module.getId())) {
                 moduleComboBox.setSelectedIndex(i);
                 // 版本从当前模块获取
-                int j = 0;
+                int j = 1;
                 for (Version version : segment.getModule().getVersions()) {
                     versionComboBox.addItem(version);
                     if (segment.getVersion().getId().equals(version.getId()))
@@ -287,8 +290,12 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
          */
         dependenceSyntaxComboBox.removeAllItems();
         contentSyntaxComboBox.removeAllItems();
-        int j = 0;
+        dependenceSyntaxComboBox.addItem(LangType.COMBOBOX_FIRST_SELECT);
+        contentSyntaxComboBox.addItem(LangType.COMBOBOX_FIRST_SELECT);
+        int j = 1;
         for (LangType value : LangType.values()) {
+            if(value == LangType.COMBOBOX_FIRST_SELECT)
+                continue;
             dependenceSyntaxComboBox.addItem(value);
             contentSyntaxComboBox.addItem(value);
 
@@ -455,6 +462,8 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
 
         moduleComboBox.removeAllItems();
         versionComboBox.removeAllItems();
+        moduleComboBox.addItem(new Module().setName(COMBOBOX_FIRST_SELECT));
+        versionComboBox.addItem(new Version().setName(COMBOBOX_FIRST_SELECT));
         for (Module module : modules) {
             moduleComboBox.addItem(module);
         }

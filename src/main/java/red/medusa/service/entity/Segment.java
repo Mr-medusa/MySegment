@@ -29,10 +29,10 @@ public class Segment extends BaseEntity {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    private LangType langDep = LangType.JAVA;
+    private LangType langDep = LangType.COMBOBOX_FIRST_SELECT;
 
     @Enumerated(EnumType.STRING)
-    private LangType langContent = LangType.JAVA;
+    private LangType langContent = LangType.COMBOBOX_FIRST_SELECT;
 
     @JoinColumn(name="module_id",referencedColumnName = "id")
     @OneToOne(fetch = FetchType.EAGER)

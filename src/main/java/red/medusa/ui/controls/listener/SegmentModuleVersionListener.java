@@ -4,6 +4,7 @@ import com.intellij.openapi.ui.ComboBox;
 import red.medusa.service.entity.Module;
 import red.medusa.service.entity.Segment;
 import red.medusa.service.entity.Version;
+import red.medusa.ui.SegmentAddOrEdit;
 import red.medusa.ui.context.SegmentContextHolder;
 
 import java.awt.event.ItemEvent;
@@ -29,21 +30,26 @@ public class SegmentModuleVersionListener implements ItemListener ,DebounceWorkA
             if (item instanceof Module) {
                 Module module = (Module) e.getItem();
                 versionComboBox.removeAllItems();
+                versionComboBox.addItem(new Version().setName(SegmentAddOrEdit.COMBOBOX_FIRST_SELECT));
+                if(module.getName().equals(SegmentAddOrEdit.COMBOBOX_FIRST_SELECT)){
+                    return;
+                }
                 for (Version version : module.getVersions()) {
                     versionComboBox.addItem(version);
                 }
-                if (!module.getVersions().isEmpty()) {
-                    versionComboBox.setSelectedIndex(0);
-                    segment.setVersion(versionComboBox.getItem());
-                }else{
-                    segment.setVersion(null);
-                }
+//                if (!module.getVersions().isEmpty()) {
+//                    versionComboBox.setSelectedIndex(0);
+//                    segment.setVersion(versionComboBox.getItem());
+//                }else{
+//                    segment.setVersion(null);
+//                }
 
                 segment.setModule(module);
-                this.work();
             } else {
                 Version version = (Version) e.getItem();
-
+                if(version.getName().equals(SegmentAddOrEdit.COMBOBOX_FIRST_SELECT)){
+                    return;
+                }
                 segment.setVersion(version);
                 this.work();
             }

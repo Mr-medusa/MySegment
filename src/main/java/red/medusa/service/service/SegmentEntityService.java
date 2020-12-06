@@ -21,6 +21,7 @@ public class SegmentEntityService extends BaseEntityService {
         Segment segment = SegmentContextHolder.getSegment();
         debounceWorker.run(() -> {
             if (segment.getName() == null || segment.getName().trim().isEmpty()) {
+                NotifyUtils.notifyWarning("名字不能为空!");
                 return;
             }
             if (segment.getModule() == null || segment.getVersion() == null) {
