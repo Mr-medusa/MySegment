@@ -72,9 +72,10 @@ public class AppSettingsComponent {
         try {
             Set<String> allBranch = SegmentGithubService.getInstance().findLocalBranchNames();
             int i = 0;
+            String currentBranchName = AppSettingsState.getInstance().branchName;
             for (String branch : allBranch) {
                 branchNames.addItem(branch);
-                if(AppSettingsState.getInstance().branchName.equals(branch)){
+                if(currentBranchName.equals(branch)){
                     branchNames.setSelectedIndex(i);
                 }
                 i++;
