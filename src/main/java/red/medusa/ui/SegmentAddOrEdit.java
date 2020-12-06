@@ -272,8 +272,6 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
                     versionComboBox.setSelectedIndex(0);
                 }
             }
-            segment.setModule(moduleComboBox.getItem());
-            segment.setVersion(versionComboBox.getItem());
         }
 
         /*

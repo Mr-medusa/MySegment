@@ -5,8 +5,17 @@ plugins {
 group 'red.medusa'
 version 'v1.0'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    maven { url "https://www.jetbrains.com/intellij-repository/releases" }
+    mavenCentral()
+}
+
 intellij {
     version '2020.2.3'
+    intellij.updateSinceUntilBuild false
 }
 configurations {
 //    all*.exclude group: 'org.slf4j', module: 'slf4j-api'
