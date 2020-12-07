@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import red.medusa.github.SegmentGithubService;
 import red.medusa.intellij.settings.AppSettingsState;
 import red.medusa.intellij.ui.SegmentComponent;
+import red.medusa.service.service.SegmentEntityService;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -29,6 +30,20 @@ public abstract class SegmentSwitchableBranchDialog implements SegmentComponent 
                 }
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        getJComponent().registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SegmentEntityService.getInstance().finishService();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        getJComponent().registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SegmentEntityService.getInstance().recreateEntityManagerFactory();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     public void doSwitchBranch() {
