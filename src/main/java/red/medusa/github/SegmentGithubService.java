@@ -70,7 +70,7 @@ public class SegmentGithubService {
                 assumeEmptyRepoThenCreateOne();
                 Ref checkout;
                 // 是否需要检出分支
-                if (!this.getCurrentBranch().equals(canonicalBranchName(trimBranchName))) {
+                if (!this.getCurrentBranch().equals(trimBranchName)) {
                     // 释放数据库连接
                     SegmentEntityService.getInstance().finishService();
                     // 检出之前先提交
@@ -82,6 +82,7 @@ public class SegmentGithubService {
                         checkout = checkout(trimBranchName, true);
                     }
                     log.info("checkout and current branch is: {}", checkout);
+                    SegmentEntityService.getInstance().recreateEntityManagerFactory();
                 }
             }
         } catch (InvalidRemoteException e1) {       // clone
@@ -287,7 +288,7 @@ public class SegmentGithubService {
 
     public void assumeEmptyRepoThenCreateOne() {
         String gitDir = settings.localSavePosition + "/.git/refs/heads";
-        if (new File(gitDir).list().length == 0) {
+        if (Objects.requireNonNull(new File(gitDir).list()).length == 0) {
             try {
                 git.commit().setMessage("Initial commit by segment plugin...").call();
             } catch (GitAPIException e) {

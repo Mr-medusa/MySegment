@@ -1,10 +1,8 @@
 package red.medusa.intellij.settings;
 
 import com.intellij.openapi.options.Configurable;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 import red.medusa.github.SegmentGithubService;
-import red.medusa.service.service.SegmentEntityService;
 
 import javax.swing.*;
 
@@ -16,7 +14,6 @@ public class AppSettingsConfigurable implements Configurable {
 
     private AppSettingsComponent mySettingsComponent;
 
-    @Nls(capitalization = Nls.Capitalization.Title)
     @Override
     public String getDisplayName() {
         return "Segment DB Settings";
@@ -61,11 +58,6 @@ public class AppSettingsConfigurable implements Configurable {
             配置仓库
          */
         SegmentGithubService.getInstance().changeForSettings();
-
-        /*
-            从新切换仓库地址
-         */
-        SegmentEntityService.getInstance().recreateEntityManagerFactory();
     }
 
     @Override

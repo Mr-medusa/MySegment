@@ -9,7 +9,6 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.components.JBScrollPane;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import red.medusa.intellij.ui.SegmentComponent;
 import red.medusa.service.entity.Module;
 import red.medusa.service.entity.Segment;
 import red.medusa.service.entity.Version;
@@ -22,9 +21,11 @@ import red.medusa.ui.table.SegmentTable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -32,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @since 2020/11/24 周二
  */
 @Slf4j
-public class SegmentHome implements SegmentComponent {
+public class SegmentHome extends SegmentSwitchableBranchDialog {
 
     private final JPanel bar = new JPanel();
     private final JPanel header = new JPanel();
@@ -49,8 +50,6 @@ public class SegmentHome implements SegmentComponent {
     private final JBScrollPane scrollPaneForTable = new JBScrollPane(table);
     private final GridBagLayout gridBag = new GridBagLayout();
 
-    private final AtomicBoolean pressCtrl = new AtomicBoolean(false);
-
     /*
         search
      */
@@ -66,6 +65,8 @@ public class SegmentHome implements SegmentComponent {
         fillFrameContent();
 
         addControlsEventLister();
+
+        registerKeyboardAction();
     }
 
     private void initControlsProp() {
@@ -120,19 +121,6 @@ public class SegmentHome implements SegmentComponent {
         //          }
         //      }
         //  });
-        table.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (KeyEvent.VK_CONTROL == e.getKeyCode()) {
-                    pressCtrl.compareAndSet(false, true);
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                pressCtrl.set(false);
-            }
-        });
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int row = ((JTable) e.getSource()).rowAtPoint(e.getPoint());        //获得行位置
@@ -140,12 +128,9 @@ public class SegmentHome implements SegmentComponent {
                 try {
                     Object o = table.getModel().getValueAt(row, SegmentTable.ID_COLUMN);   //获得点击单元格数据
 
-                    if (e.getButton() == 1) {
-                        if (pressCtrl.getAndSet(false)) {
-                            log.info("Ctrl+鼠标左键 and {}", pressCtrl.get());
-                            SegmentContextHolder.setSegment((Segment) new Segment().setId(Long.parseLong(o.toString())));
-                            new SegmentDetailDialog().show();
-                        }
+                    if (e.getButton() == 1 && e.isControlDown()) {
+                        SegmentContextHolder.setSegment((Segment) new Segment().setId(Long.parseLong(o.toString())));
+                        new SegmentDetailDialog().show();
                     } else if (e.getButton() == 3) {
                         SegmentContextHolder.setSegment((Segment) new Segment().setId(Long.parseLong(o.toString())));
                         popupInvoked(e.getComponent(), e.getPoint().x, e.getPoint().y, row);
@@ -227,7 +212,7 @@ public class SegmentHome implements SegmentComponent {
                     refresh2();
                     return;
                 }
-                if(version.getName().equals(MODULE_VERSION_FIRST_SELECT)){
+                if (version.getName().equals(MODULE_VERSION_FIRST_SELECT)) {
                     queryAction.queryByModule(module.getId());
                     return;
                 }
