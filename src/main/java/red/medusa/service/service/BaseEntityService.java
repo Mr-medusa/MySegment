@@ -169,6 +169,13 @@ public abstract class BaseEntityService {
         }
         return dbUrl;
     }
+
+    public boolean isClose(){
+        return emf == null || !emf.isOpen();
+    }
+    public boolean isOpen(){
+        return emf != null && emf.isOpen();
+    }
 }
 
 
