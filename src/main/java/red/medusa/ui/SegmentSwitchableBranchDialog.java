@@ -34,14 +34,22 @@ public abstract class SegmentSwitchableBranchDialog implements SegmentComponent 
         getJComponent().registerKeyboardAction(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SegmentEntityService.getInstance().finishService();
+                SegmentEntityService entityService = SegmentEntityService.getInstance();
+                entityService.finishService();
+                if(entityService.isClose()){
+                    NotifyUtils.notifyInfo("数据库已断开连接...");
+                }
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         getJComponent().registerKeyboardAction(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SegmentEntityService.getInstance().recreateEntityManagerFactory();
+                SegmentEntityService entityService = SegmentEntityService.getInstance();
+                entityService.recreateEntityManagerFactory();
+                if(entityService.isOpen()){
+                    NotifyUtils.notifyInfo("数据库已建立连接...");
+                }
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }

@@ -1,8 +1,8 @@
 package red.medusa.ui.controls.listener;
 
+import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.ui.EditorTextField;
-import org.jetbrains.annotations.NotNull;
 import red.medusa.ui.context.SegmentContextHolder;
 
 /**
@@ -17,7 +17,7 @@ public class ContentTextAreaListener  implements DocumentListener,DebounceWorkAc
     }
 
     @Override
-    public void documentChanged(com.intellij.openapi.editor.event.@NotNull DocumentEvent event) {
+    public void documentChanged(DocumentEvent event) {
         SegmentContextHolder.getSegment().setContent(contentTextArea.getText());
         this.work();
     }

@@ -22,7 +22,7 @@ public class NotifyUtils {
         content = content != null ? content : "";
         helpText = helpText != null ? helpText : "";
         helpUrl = helpUrl != null ? helpUrl : "";
-        Notification notification = NOTIFICATION_GROUP.createNotification(content, NotificationType.ERROR);
+        Notification notification = NOTIFICATION_GROUP.createNotification(content, NotificationType.WARNING);
         notification.addAction(new BrowseNotificationAction(helpText, helpUrl));
         notification.notify(SegmentAppUtils.getProject());
     }
@@ -30,7 +30,7 @@ public class NotifyUtils {
     public static void notifyError(String content) {
         content = content != null ? content : "notifyError";
         Notification notification = NOTIFICATION_GROUP.createNotification(content, NotificationType.ERROR);
-        Notifications.Bus.notifyAndHide(notification, SegmentAppUtils.getProject());
+        notification.notify(SegmentAppUtils.getProject());
     }
 
 
