@@ -20,7 +20,7 @@ public class SegmentAction extends SegmentEventAction<Segment> {
     @Override
     public List<Object[]> list() {
         Function<EntityManager, List<Object[]>> function = entityManager -> {
-            String sql = "select s.name,s.description,m.name as mName,s.id from segment s left join module m on s.module_id=m.id order by m.id,s.version_id,s.id";
+            String sql = "select s.name,m.name as mName,s.id from segment s left join module m on s.module_id=m.id order by m.id,s.version_id,s.id";
             List<Object[]> list = entityManager.createNativeQuery(sql).getResultList();
             entityManager.clear();
             return list;

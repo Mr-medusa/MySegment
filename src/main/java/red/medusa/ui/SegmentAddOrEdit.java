@@ -155,13 +155,16 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
         body.add(new JSeparator());
         body.add(syntaxBox);
 
-        body.add(Box.createVerticalStrut(strut));
-        body.add(new JSeparator());
-        body.add(dependenceBox);
 
         body.add(Box.createVerticalStrut(strut));
         body.add(new JSeparator());
         body.add(contentBox);
+
+        body.add(Box.createVerticalStrut(strut));
+        body.add(new JSeparator());
+        body.add(dependenceBox);
+
+
     }
 
     private void fillFrameContent() {

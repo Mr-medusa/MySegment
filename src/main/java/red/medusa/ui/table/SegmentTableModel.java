@@ -10,7 +10,7 @@ import java.util.List;
 public class SegmentTableModel extends AbstractTableModel {
     private List<Object[]> segmentObjects;
 
-    private final String[] n = {"标题", "描述", "模块","ID"};
+    private final String[] n = {"标题", "模块","ID"};
 
     public SegmentTableModel(List<Object[]> segmentObjects) {
         this.segmentObjects = segmentObjects;

@@ -15,7 +15,7 @@ import java.util.List;
  * @since 2020/11/24 周二
  */
 public class SegmentTable extends JBTable {
-    public static final int ID_COLUMN = 3;
+    public static final int ID_COLUMN = 2;
     private final SegmentTableModel tableModel = new SegmentTableModel(new ArrayList<>());
 
     public SegmentTable() {
@@ -24,6 +24,8 @@ public class SegmentTable extends JBTable {
         this.setFillsViewportHeight(true);
 
         TableColumnModel tcm = this.getColumnModel();
+        TableColumn moduleColumn = tcm.getColumn(1);
+        moduleColumn.setPreferredWidth(120);
         TableColumn tc = tcm.getColumn(ID_COLUMN);
         this.removeColumn(tc);//隐藏某列
     }

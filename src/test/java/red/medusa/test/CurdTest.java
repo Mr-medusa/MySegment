@@ -79,7 +79,7 @@ public class CurdTest {
         keyword = keyword.trim();
 
         Query segmentQuery = entityManager.createNativeQuery(
-                "select s.name,s.description,m.name as mName,s.id from " +
+                "select s.name,m.name as mName,s.id from " +
                 "module m left join version v on m.id=v.module_id left join segment s on s.module_id=m.id " +
                 "where m.id=?1 and v.id=?2 order by m.name,s.create_time desc"
         );
