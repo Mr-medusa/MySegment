@@ -9,15 +9,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 intellij {
-    version '201.8743.12'
-    type 'IC'
-    plugins 'android'
-    intellij.updateSinceUntilBuild false
-}
-
-runIde {
-    ideDirectory 'E:\\IDE\\AndroidStudio'
-//    jbrVersion 'jbr-11_0_8b944.34'
+    version '2020.2.3'
 }
 
 repositories {

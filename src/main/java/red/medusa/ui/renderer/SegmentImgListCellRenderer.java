@@ -45,7 +45,7 @@ public class SegmentImgListCellRenderer extends JPanel implements ListCellRender
 
             jLayeredPane.setSize(dimension);
             jLayeredPane.setPreferredSize(dimension);
-            jLayeredPane.setMaximumSize(dimension);
+            jLayeredPane.setMinimumSize(dimension);
 
             /*
                 告诉JCombobox当前的Cell尺寸多大
@@ -53,7 +53,7 @@ public class SegmentImgListCellRenderer extends JPanel implements ListCellRender
             this.add(jLayeredPane);
             this.setSize(dimension);
             this.setPreferredSize(dimension);
-            this.setMaximumSize(dimension);
+            this.setMinimumSize(dimension);
 
             renderMap.put(index, jLayeredPane);
             renderCheckedMap.put(index, checkedLabel);
