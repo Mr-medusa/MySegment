@@ -47,12 +47,16 @@ public class SegmentImgListPanel extends JPanel {
         Dimension dimension = new Dimension(image.getIconWidth(), image.getIconHeight() + 10);
         segmentImageLabel.setIcon(image);
         segmentImageLabel.setSize(dimension);
-        Icon icon = SdkIcons.Sdk_checked_blue_icon;
-        JLabel checkedLabel = new JLabel(icon);
-        checkedLabel.setBounds(20, 30, 32, 32);
+        Icon icon = SdkIcons.Sdk_partially_checked_icon;
+        JBLabel checkedLabel = new JBLabel(icon);
+        Dimension checkedDimension = new Dimension(32, 32);
+        checkedLabel.setPreferredSize(checkedDimension);
+        checkedLabel.setMaximumSize(checkedDimension);
+        checkedLabel.setMinimumSize(checkedDimension);
+        checkedLabel.setBounds(10, 15, 32, 32);
         checkedLabel.setVisible(false);
 
-        jLayeredPane.add(segmentImageLabel, 0, 1);
+        jLayeredPane.add(segmentImageLabel, 0);
         jLayeredPane.add(checkedLabel, 1, 0);
 
         jLayeredPane.setSize(dimension);
