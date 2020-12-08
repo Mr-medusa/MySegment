@@ -84,9 +84,7 @@ public class SegmentDetail implements SegmentComponent {
 
     private void initFrame() {
         int strut = 10;
-
         body.add(new JSeparator());
-        body.add(Box.createVerticalStrut(strut));
         body.add(nameBox);
         body.add(descBox);
         body.add(Box.createVerticalStrut(strut));
@@ -121,7 +119,7 @@ public class SegmentDetail implements SegmentComponent {
     }
 
     private void fillFrameContent() {
-        nameBox.add(new SegmentLabel("名字"));
+        nameBox.add(new SegmentLabel("名字",60,30));
         nameBox.add(nameLabel);
 
         descBox.add(new SegmentLabel("描述"));

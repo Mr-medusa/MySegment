@@ -9,8 +9,8 @@ public class SegmentTextField extends JTextField {
 
     public SegmentTextField() {
         this.setBorder(BorderFactory.createEmptyBorder());
-        super.setPreferredSize(new Dimension(0, 35));
-        super.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+        super.setPreferredSize(new Dimension(0, 30));
+        super.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
     }
 
     @Override
