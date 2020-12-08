@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.Entity;
 import javax.persistence.Lob;
+import javax.persistence.Transient;
 
 /**
  * @author huguanghui
@@ -18,7 +19,8 @@ import javax.persistence.Lob;
 public class Img extends BaseEntity {
     @Lob
     private byte[] image;
-
+    @Transient
+    private String filename;
     @Override
     public String toString() {
         return "Img{" +

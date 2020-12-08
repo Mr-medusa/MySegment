@@ -9,7 +9,7 @@ import red.medusa.intellij.SdkIcons;
 import red.medusa.intellij.utils.SegmentAppUtils;
 import red.medusa.ui.controls.SegmentDelInquiryDialogWrapper;
 import red.medusa.ui.segment_action.SegmentAction;
-import red.medusa.ui.table.SegmentTableModel;
+import red.medusa.ui.controls.table.SegmentTableModel;
 
 import javax.swing.*;
 

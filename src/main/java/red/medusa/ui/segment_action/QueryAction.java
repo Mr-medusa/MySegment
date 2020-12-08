@@ -2,8 +2,8 @@ package red.medusa.ui.segment_action;
 
 import red.medusa.service.service.DebounceWorker;
 import red.medusa.service.service.SegmentEntityService;
-import red.medusa.ui.table.SegmentTable;
-import red.medusa.ui.table.SegmentTableModel;
+import red.medusa.ui.controls.table.SegmentTable;
+import red.medusa.ui.controls.table.SegmentTableModel;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;

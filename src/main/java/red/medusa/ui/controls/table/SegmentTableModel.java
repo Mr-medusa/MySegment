@@ -1,4 +1,4 @@
-package red.medusa.ui.table;
+package red.medusa.ui.controls.table;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;

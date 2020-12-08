@@ -16,7 +16,7 @@ import red.medusa.ui.action.*;
 import red.medusa.ui.context.SegmentContextHolder;
 import red.medusa.ui.segment_action.ModuleAction;
 import red.medusa.ui.segment_action.QueryAction;
-import red.medusa.ui.table.SegmentTable;
+import red.medusa.ui.controls.table.SegmentTable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

@@ -13,7 +13,7 @@ import red.medusa.service.entity.*;
 import red.medusa.ui.context.SegmentContextHolder;
 import red.medusa.ui.controls.*;
 import red.medusa.ui.controls.listener.*;
-import red.medusa.ui.renderer.SegmentImgListCellRenderer;
+import red.medusa.ui.controls.img.SegmentImgListPanel;
 import red.medusa.ui.segment_action.ModuleAction;
 import red.medusa.ui.segment_action.SegmentAction;
 
@@ -40,8 +40,7 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
     private final DefaultListModel<Url> urlListModel = new DefaultListModel<>();
     private final JBList<Url> urlListForAdd = new JBList<>(urlListModel);
 
-    private final DefaultListModel<Img> imgListModel = new DefaultListModel<>();
-    private final JBList<Img> imgListForAdd = new JBList<>(imgListModel);
+    private final SegmentImgListPanel segmentImgListPanel = new SegmentImgListPanel();
 
     public static final String IMG_LABEL = "请选择图片...  ";
     private final List<VirtualFile> tempImgListModel = new ArrayList<>();
@@ -102,11 +101,6 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
 
     private DependenceTextAreaListener dependenceTextAreaListener;
     private ContentTextAreaListener contentTextAreaListener;
-
-    /*
-        render
-     */
-    private SegmentImgListCellRenderer cellRenderer;
 
     public SegmentAddOrEdit() {
         /*
@@ -205,7 +199,9 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
          */
         JPanel imgListPanel = new JPanel(new GridLayout(1, 1));
 
-        imgListPanel.add(imgListForAdd);
+//        imgListPanel.add(imgListForAdd);
+
+        imgListPanel.add(segmentImgListPanel);
 
         this.urlBox.add(new SegmentLabel("链接"));
         Box urlAddUrlBox = Box.createHorizontalBox();
@@ -281,11 +277,11 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
             图片 url
          */
         urlListModel.removeAllElements();
-        imgListModel.removeAllElements();
+        segmentImgListPanel.clearAllImg();
         if (segment.getUrls() != null)
             segment.getUrls().forEach(urlListModel::addElement);
         if (segment.getImgs() != null)
-            segment.getImgs().forEach(imgListModel::addElement);
+            segmentImgListPanel.addImgs(segment.getImgs());
         /*
             类型
          */
@@ -295,7 +291,7 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
         contentSyntaxComboBox.addItem(LangType.COMBOBOX_FIRST_SELECT);
         int j = 1;
         for (LangType value : LangType.values()) {
-            if(value == LangType.COMBOBOX_FIRST_SELECT)
+            if (value == LangType.COMBOBOX_FIRST_SELECT)
                 continue;
             dependenceSyntaxComboBox.addItem(value);
             contentSyntaxComboBox.addItem(value);
@@ -324,8 +320,6 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
         dependenceBox.add(dependenceTextArea);
         contentBox.add(contentTextArea);
 
-        cellRenderer.clear();
-
         addControlsEvent();
     }
 
@@ -348,10 +342,6 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
         contentSyntaxComboBox.setPreferredSize(new Dimension(w, h));
 
         urlListForAdd.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        imgListForAdd.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        cellRenderer = new SegmentImgListCellRenderer();
-        imgListForAdd.setCellRenderer(cellRenderer);
     }
 
     /*
@@ -366,13 +356,11 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
      */
         ActionListener urlImgButtonListener = new SegmentButtonListener(
                 urlListModel,
-                imgListModel,
                 tempImgListModel,
                 urlTextField,
                 imgLabelField,
                 urlListForAdd,
-                imgListForAdd,
-                cellRenderer
+                segmentImgListPanel
         );
         addUrlBtn.addActionListener(urlImgButtonListener);
         addImgBtn.addActionListener(urlImgButtonListener);
@@ -455,7 +443,7 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
         removeControlEvent();
 
         urlListModel.removeAllElements();
-        imgListModel.removeAllElements();
+        segmentImgListPanel.clearAllImg();
         imgLabelField.setText(IMG_LABEL);
         urlTextField.setText("");
 

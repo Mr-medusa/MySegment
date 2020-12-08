@@ -12,7 +12,7 @@ import red.medusa.ui.SegmentAddOrEdit;
 import red.medusa.ui.context.SegmentContextHolder;
 import red.medusa.ui.controls.SegmentLabel2;
 import red.medusa.ui.controls.SegmentTextField;
-import red.medusa.ui.renderer.SegmentImgListCellRenderer;
+import red.medusa.ui.controls.img.SegmentImgListPanel;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -36,31 +36,24 @@ public class SegmentButtonListener implements ActionListener, DebounceWorkAction
     public static final String ADD_IMG_COMMAND = "ADD_IMG_COMMAND";
     public static final String DEL_IMG_COMMAND = "DEL_IMG_COMMAND";
     private final DefaultListModel<Url> urlListModel;
-    private final DefaultListModel<Img> imgListModel;
     private final List<VirtualFile> tempImgListModel;
     private final SegmentTextField urlTextField;
     private final SegmentLabel2 imgLabelField;
     private final JBList<Url> urlListForAdd;
-    private final JBList<Img> imgListForAdd;
-
-    private final SegmentImgListCellRenderer cellRenderer;
+    private final SegmentImgListPanel segmentImgListPanel;
 
     public SegmentButtonListener(DefaultListModel<Url> urlListModel,
-                                 DefaultListModel<Img> imgListModel,
                                  List<VirtualFile> tempImgListModel,
                                  SegmentTextField urlTextField,
                                  SegmentLabel2 imgLabelField,
                                  JBList<Url> urlListForAdd,
-                                 JBList<Img> imgListForAdd,
-                                 SegmentImgListCellRenderer cellRenderer) {
+                                 SegmentImgListPanel segmentImgListPanel) {
         this.urlListModel = urlListModel;
-        this.imgListModel = imgListModel;
         this.tempImgListModel = tempImgListModel;
         this.urlTextField = urlTextField;
         this.imgLabelField = imgLabelField;
         this.urlListForAdd = urlListForAdd;
-        this.imgListForAdd = imgListForAdd;
-        this.cellRenderer = cellRenderer;
+        this.segmentImgListPanel = segmentImgListPanel;
     }
 
     @Override
@@ -77,27 +70,30 @@ public class SegmentButtonListener implements ActionListener, DebounceWorkAction
                 urlTextField.setText("");
                 break;
             case ADD_IMG_COMMAND:
-                Set<Img> list = new LinkedSet<>();
+                Set<Img> set = new LinkedSet<>();
                 for (VirtualFile file : tempImgListModel) {
                     try {
                         InputStream inputStream = file.getInputStream();
                         byte[] imgBytes = new byte[inputStream.available()];
                         inputStream.read(imgBytes, 0, imgBytes.length);
-                        Img img = new Img().setImage(imgBytes);
-                        imgListModel.addElement(img);
 
-                        //  写入数据库
-                        list.add(img);
+                        set.add(new Img()
+                                .setImage(imgBytes)
+                                .setFilename(file.getPath()
+                                ));
                     } catch (IOException ioException) {
                         NotifyUtils.notifyWarning("加载图片异常: " + ioException.getMessage());
                     }
                 }
                 imgLabelField.setText(SegmentAddOrEdit.IMG_LABEL);
-
+                /*
+                    更新 UI
+                 */
+                segmentImgListPanel.addImgs(set);
                 /*
                     写入数据库
                  */
-                addImg(list);
+                addImg(set);
                 break;
             case DEL_URL_COMMAND:
                 int urlIndex = urlListForAdd.getSelectedIndex();
@@ -108,14 +104,7 @@ public class SegmentButtonListener implements ActionListener, DebounceWorkAction
                 }
                 break;
             case DEL_IMG_COMMAND:
-                int imgIndex = imgListForAdd.getSelectedIndex();
-                if (imgIndex != -1) {
-                    Img img = imgListForAdd.getSelectedValue();
-                    if (this.removeImg(img,imgIndex) == 1) {
-                        cellRenderer.removeByIndex(imgIndex);
-                        imgListModel.remove(imgIndex);
-                    }
-                }
+                this.removeImg(segmentImgListPanel.delImg());
                 break;
         }
     }
@@ -164,20 +153,20 @@ public class SegmentButtonListener implements ActionListener, DebounceWorkAction
         return -1;
     }
 
-    public int removeImg(Img img,int index) {
-        Segment segment = SegmentContextHolder.getSegment();
-        Set<Img> imgs = segment.getImgs();
-        if (img.getId() == null) {
+    public int removeImg(Img img) {
+        if (img == null || img.getId() == null) {
             NotifyUtils.notifyInfo("图片还未保存成功,请稍后重试!");
             return -1;
         }
 
+        Segment segment = SegmentContextHolder.getSegment();
+        Set<Img> imgs = segment.getImgs();
+
         if (imgs != null) {
             Iterator<Img> iterator = imgs.iterator();
-            int i = 0;
             while (iterator.hasNext()) {
-                iterator.next();
-                if (i++ == index) {
+                Img next = iterator.next();
+                if (img.getId().equals(next.getId())) {
                     iterator.remove();
                     break;
                 }
