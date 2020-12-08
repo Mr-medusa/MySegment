@@ -112,12 +112,12 @@ public class SegmentDetail implements SegmentComponent {
         body.add(Box.createVerticalStrut(strut));
         body.add(new JSeparator());
         body.add(Box.createVerticalStrut(strut));
-        body.add(dependenceBox);
+        body.add(contentBox);
 
         body.add(Box.createVerticalStrut(strut));
         body.add(new JSeparator());
-        body.add(Box.createVerticalStrut(2));
-        body.add(contentBox);
+        body.add(Box.createVerticalStrut(strut));
+        body.add(dependenceBox);
     }
 
     private void fillFrameContent() {
