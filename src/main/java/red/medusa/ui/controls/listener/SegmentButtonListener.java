@@ -155,7 +155,7 @@ public class SegmentButtonListener implements ActionListener, DebounceWorkAction
 
     public int removeImg(Img img) {
         if (img == null || img.getId() == null) {
-            NotifyUtils.notifyInfo("图片还未保存成功,请稍后重试!");
+            NotifyUtils.notifyWarning("图片还未保存成功,请稍后重试!");
             return -1;
         }
 

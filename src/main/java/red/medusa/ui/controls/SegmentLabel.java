@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public class SegmentLabel extends JLabel {
-
     public SegmentLabel(String label) {
         this(label,60);
     }
