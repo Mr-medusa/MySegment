@@ -2,7 +2,6 @@ package red.medusa.service.service;
 
 import lombok.extern.slf4j.Slf4j;
 import red.medusa.service.entity.Segment;
-import red.medusa.ui.NotifyUtils;
 import red.medusa.ui.context.SegmentContextHolder;
 
 /**
@@ -21,11 +20,12 @@ public class SegmentEntityService extends BaseEntityService {
         Segment segment = SegmentContextHolder.getSegment();
         debounceWorker.run(() -> {
             if (segment.getName() == null || segment.getName().trim().isEmpty()) {
-                NotifyUtils.notifyWarning("名字不能为空!");
+                // 注释掉烦人的提示
+                // NotifyUtils.notifyWarning("名字不能为空!");
                 return;
             }
             if (segment.getModule() == null || segment.getVersion() == null) {
-                NotifyUtils.notifyWarning("请先选择模块或版本!");
+//                NotifyUtils.notifyWarning("请先选择模块或版本!");
                 return;
             }
 
