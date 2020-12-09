@@ -197,9 +197,6 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
             Img 列表
          */
         JPanel imgListPanel = new JPanel(new GridLayout(1, 1));
-
-//        imgListPanel.add(imgListForAdd);
-
         imgListPanel.add(segmentImgListPanel);
 
         this.urlBox.add(new SegmentLabel("链接"));
@@ -218,7 +215,6 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
         imgAddUrlBox.add(addImgBtn);
         imgAddUrlBox.add(delImgBtn);
         imgListWithAddBox.add(imgListPanel);
-        imgListWithAddBox.add(Box.createVerticalStrut(5));
         imgListWithAddBox.add(imgAddUrlBox);
         imgBox.add(imgListWithAddBox);
     }
