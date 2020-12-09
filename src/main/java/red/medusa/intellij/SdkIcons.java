@@ -19,6 +19,8 @@ public class SdkIcons {
   public static final Icon Sdk_deleteHovered_icon = IconLoader.getIcon("/icons/deleteHovered.svg");
 
   public static final Icon Sdk_checked_blue_icon = IconLoader.getIcon("/icons/checked_blue.png");
+  public static final Icon Sdk_partially_checked_icon = IconLoader.getIcon("/icons/partially_checked.png");
+  public static final Icon Sdk_partially_checked_icon2 = IconLoader.getIcon("/icons/partially_checked2.png");
 
   public static final Icon Sdk_Farmer_icon = IconLoader.getIcon("/icons/Farmer.svg");
   public static final Icon Sdk_clear_icon = IconLoader.getIcon("/icons/clear.svg");

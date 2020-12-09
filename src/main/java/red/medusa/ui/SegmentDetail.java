@@ -119,7 +119,7 @@ public class SegmentDetail implements SegmentComponent {
     }
 
     private void fillFrameContent() {
-        nameBox.add(new SegmentLabel("名字",60,30));
+        nameBox.add(new SegmentLabel("名字", 60, 30));
         nameBox.add(nameLabel);
 
         descBox.add(new SegmentLabel("描述"));
@@ -188,13 +188,14 @@ public class SegmentDetail implements SegmentComponent {
         }
         imgBoxForAdd.removeAll();
         if (!(segment.getImgs() == null || segment.getImgs().isEmpty())) {
+            int last = segment.getImgs().size() - 1;
+            int i = 0;
             for (Img img : segment.getImgs()) {
                 JBLabel jbLabel = new JBLabel();
                 jbLabel.setIcon(new ImageIcon(img.getImage()));
                 imgBoxForAdd.add(jbLabel);
-                JLabel jLabel = new JLabel(" ");
-                jLabel.setSize(1,3);
-                imgBoxForAdd.add(jLabel);
+                if (i++ != last)
+                    imgBoxForAdd.add(Box.createVerticalStrut(10));
             }
         }
          /*
