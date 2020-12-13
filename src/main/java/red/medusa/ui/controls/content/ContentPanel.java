@@ -3,6 +3,7 @@ package red.medusa.ui.controls.content;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.ui.ComboBox;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
 import lombok.extern.slf4j.Slf4j;
@@ -102,27 +103,15 @@ public class ContentPanel extends Box {
                 contentPanelList.work(content);
             }
         });
-        this.textField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        this.textField.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
-            public void insertUpdate(javax.swing.event.DocumentEvent e) {
-                textChanged(e);
-            }
-            @Override
-            public void removeUpdate(javax.swing.event.DocumentEvent e) {
-                textChanged(e);
-            }
-            @Override
-            public void changedUpdate(javax.swing.event.DocumentEvent e) {
-                textChanged(e);
-            }
-            private void textChanged(javax.swing.event.DocumentEvent e) {
+            protected void textChanged(javax.swing.event.@NotNull DocumentEvent e) {
                 String text = textField.getText();
                 content.setLangType((LangType) comboBox.getSelectedItem());
                 content.setTitle(text.equals(tip) ? "" : text);
                 contentPanelList.work(content);
             }
         });
-
         this.comboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {

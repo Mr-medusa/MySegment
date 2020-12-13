@@ -86,14 +86,9 @@ public class SegmentDetailDialog extends DialogWrapper {
             Content content = contents.stream().findFirst().get();
             langType = content.getLangType();
             contentStr = content.getContent();
-        } else if (!contents.isEmpty()) {
-            for (Content content : contents) {
-                if (content.getId()!=null && content.getId().equals(this.content.getId())) {
-                    langType = content.getLangType();
-                    contentStr = content.getContent();
-                    break;
-                }
-            }
+        } else if (content != null) {
+            langType = content.getLangType();
+            contentStr = content.getContent();
         }
 
         textField = new SegmentEditorTextField(
@@ -113,13 +108,15 @@ public class SegmentDetailDialog extends DialogWrapper {
         Box verticalBox = Box.createVerticalBox();
         for (Content content : segment.getContents()) {
             String title = content.getTitle() != null && !content.getTitle().trim().isEmpty() ?
-                    content.getTitle() : LangType.JAVA.name();
+                    content.getTitle() : content.getLangType().name();
             JButton button = new JButton(title) {
                 final int weight = 85;
+
                 @Override
                 public Dimension getMaximumSize() {
                     return new Dimension(weight, 40);
                 }
+
                 @Override
                 public Dimension getPreferredSize() {
                     return new Dimension(weight, 40);
@@ -141,7 +138,7 @@ public class SegmentDetailDialog extends DialogWrapper {
         return verticalBox;
     }
 
-    public static void scrollToTop(SegmentEditorTextField segmentEditorTextField){
+    public static void scrollToTop(SegmentEditorTextField segmentEditorTextField) {
         segmentEditorTextField.scrollRectToVisible(new Rectangle(0, 0));
         segmentEditorTextField.revalidate();
     }
