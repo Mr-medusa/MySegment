@@ -62,7 +62,7 @@ public class ContentPanel extends Box {
     }
 
     public ContentPanel(Content content, ContentPanelList contentPanelList) {
-        this(content, contentPanelList, 170);
+        this(content, contentPanelList, 190);
     }
 
     /*

@@ -28,7 +28,7 @@ public class ContentPanelDetail extends Box {
             }
         };
         jPanel.add(textField);
-        SegmentLabel textField2 = new SegmentLabel("", 300) {
+        SegmentLabel textField2 = new SegmentLabel("", 200) {
             @Override
             public int getVerticalAlignment() {
                 return SwingConstants.CENTER;
@@ -42,7 +42,7 @@ public class ContentPanelDetail extends Box {
 
         this.add(jPanel);
 
-        height = height == null ? 170 : height;
+        height = height == null ? 190 : height;
         SegmentEditorTextField segmentEditorTextField = new SegmentEditorTextField(
                 content.getContent(),
                 SegmentAppUtils.getProject(),
