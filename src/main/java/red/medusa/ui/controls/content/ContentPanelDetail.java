@@ -42,7 +42,7 @@ public class ContentPanelDetail extends Box {
 
         this.add(jPanel);
 
-        height = height == null ? 280 : height;
+        height = height == null ? 170 : height;
         SegmentEditorTextField segmentEditorTextField = new SegmentEditorTextField(
                 content.getContent(),
                 SegmentAppUtils.getProject(),
