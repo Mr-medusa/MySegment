@@ -2,18 +2,23 @@ package red.medusa.ui;
 
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.ContentManager;
 import lombok.extern.slf4j.Slf4j;
 import red.medusa.intellij.ui.SegmentComponent;
-import red.medusa.intellij.utils.SegmentAppUtils;
-import red.medusa.service.entity.*;
+import red.medusa.service.entity.Category;
+import red.medusa.service.entity.Module;
+import red.medusa.service.entity.Segment;
+import red.medusa.service.entity.Url;
 import red.medusa.ui.context.SegmentContextHolder;
-import red.medusa.ui.controls.*;
-import red.medusa.ui.controls.listener.*;
+import red.medusa.ui.controls.SegmentImageBrowserButton;
+import red.medusa.ui.controls.SegmentLabel;
+import red.medusa.ui.controls.SegmentLabel2;
+import red.medusa.ui.controls.SegmentTextField;
+import red.medusa.ui.controls.content.ContentPanelList;
 import red.medusa.ui.controls.img.SegmentImgListPanel;
+import red.medusa.ui.controls.listener.*;
 import red.medusa.ui.segment_action.ModuleAction;
 import red.medusa.ui.segment_action.SegmentAction;
 
@@ -52,19 +57,10 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
     private final JButton delImgBtn = new JButton(SegmentButtonListener.DEL);
 
     private final ComboBox<Module> moduleComboBox = new ComboBox<>();
-    private final ComboBox<Version> versionComboBox = new ComboBox<>();
-
-    private final ComboBox<LangType> dependenceSyntaxComboBox = new ComboBox<>();
-    private final ComboBox<LangType> contentSyntaxComboBox = new ComboBox<>();
+    private final ComboBox<Category> categoryComboBox = new ComboBox<>();
 
     private final SegmentTextField nameTextField = new SegmentTextField();
-    private final JTextArea descTextField = new JTextArea(3, 5);
-
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //+++++++++++++++++++++++++++++++++++++      Editor            ++++++++++++++++++++++++++++++++++++++++++++++
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    private EditorTextField contentTextArea = new SegmentEditorTextField("", SegmentAppUtils.getProject(), null, new Dimension(0, 100));
-    private EditorTextField dependenceTextArea = new SegmentEditorTextField("", SegmentAppUtils.getProject(), null, new Dimension(0, 100));
+    private final JTextArea descTextField = new JTextArea();
 
     /*
         layout
@@ -73,7 +69,7 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
     // 名字
     private final Box nameBox = Box.createHorizontalBox();
     // 模块版本
-    private final JPanel versionModuleBox = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    private final JPanel ModuleCategoryBox = new JPanel(new FlowLayout(FlowLayout.LEFT));
     // 描述
     private final Box descBox = Box.createHorizontalBox();
     // 链接
@@ -82,25 +78,20 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
     // 图片
     private final Box imgBox = Box.createHorizontalBox();
     private final Box imgListWithAddBox = Box.createVerticalBox();
-    // 类型
-    private final Box syntaxBox = Box.createHorizontalBox();
-    private final JPanel syntaxFlow = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    // 依赖
-    private final Box dependenceBox = Box.createHorizontalBox();
-    // 内容
-    private final Box contentBox = Box.createHorizontalBox();
+
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++      Editor            ++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    private final ContentPanelList contentPanelList = new ContentPanelList();
 
     /*
         listener
      */
-    private SegmentModuleVersionListener moduleVersionItemListener;
-    private DependenceSyntaxComboListener dependenceSyntaxComboListener;
-    private ContentSyntaxComboListener contentSyntaxComboListener;
+    private SegmentModuleCategoryListener moduleVersionItemListener;
+
     private NameTextFieldListener nameTextFieldListener;
     private DescTextFieldListener descTextFieldListener;
 
-    private DependenceTextAreaListener dependenceTextAreaListener;
-    private ContentTextAreaListener contentTextAreaListener;
 
     public SegmentAddOrEdit() {
         /*
@@ -140,28 +131,28 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
         body.add(Box.createVerticalStrut(strut));
         body.add(imgBox);
 
-        body.add(Box.createVerticalStrut(strut));
         body.add(new JSeparator());
-        body.add(versionModuleBox);
-
         body.add(Box.createVerticalStrut(strut));
-        body.add(new JSeparator());
-        body.add(syntaxBox);
-
+        body.add(ModuleCategoryBox);
 
         body.add(Box.createVerticalStrut(strut));
         body.add(new JSeparator());
-        body.add(contentBox);
-
-        body.add(Box.createVerticalStrut(strut));
+        JPanel jPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        SegmentLabel segmentLabel = new SegmentLabel("内容"){
+            @Override
+            public int getVerticalAlignment() {
+                return SwingConstants.CENTER;
+            }
+        };
+        jPanel.add(segmentLabel);
+        body.add(jPanel);
         body.add(new JSeparator());
-        body.add(dependenceBox);
-
-
+        body.add(contentPanelList);
+        body.add(Box.createVerticalGlue());
     }
 
     private void fillFrameContent() {
-        nameBox.add(new SegmentLabel("名字",60,30));
+        nameBox.add(new SegmentLabel("名字", 60, 30));
         nameBox.add(nameTextField);
 
         descBox.add(new SegmentLabel("描述"));
@@ -169,24 +160,10 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
 
         int labelWidth = 70;
         int labelHeight = 30;
-        versionModuleBox.add(new SegmentLabel("模块", labelWidth, labelHeight));
-        versionModuleBox.add(moduleComboBox);
-        versionModuleBox.add(new SegmentLabel("版本", labelWidth, labelHeight));
-        versionModuleBox.add(versionComboBox);
-
-        syntaxFlow.add(new SegmentLabel("依赖类型", labelWidth, labelHeight));
-        syntaxFlow.add(dependenceSyntaxComboBox);
-        syntaxFlow.add(new SegmentLabel("内容类型", labelWidth, labelHeight));
-        syntaxFlow.add(contentSyntaxComboBox);
-        syntaxBox.add(syntaxFlow);
-
-        dependenceBox.add(new SegmentLabel("依赖"));
-        dependenceBox.add(dependenceTextArea);
-
-        contentBox.add(new SegmentLabel("内容"));
-        contentBox.add(contentTextArea);
-
-
+        ModuleCategoryBox.add(new SegmentLabel("模块", labelWidth, labelHeight));
+        ModuleCategoryBox.add(moduleComboBox);
+        ModuleCategoryBox.add(new SegmentLabel("分类", labelWidth, labelHeight));
+        ModuleCategoryBox.add(categoryComboBox);
         /*
             URL 列表
          */
@@ -235,9 +212,9 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
             模块 版本
          */
         moduleComboBox.removeAllItems();
-        versionComboBox.removeAllItems();
+        categoryComboBox.removeAllItems();
         moduleComboBox.addItem(new Module().setName(COMBOBOX_FIRST_SELECT));
-        versionComboBox.addItem(new Version().setName(COMBOBOX_FIRST_SELECT));
+        categoryComboBox.addItem(new Category().setName(COMBOBOX_FIRST_SELECT));
         List<Module> modules = new ModuleAction().list();
         int i = 1;
         for (Module module : modules) {
@@ -246,10 +223,10 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
                 moduleComboBox.setSelectedIndex(i);
                 // 版本从当前模块获取
                 int j = 1;
-                for (Version version : segment.getModule().getVersions()) {
-                    versionComboBox.addItem(version);
-                    if (segment.getVersion().getId().equals(version.getId()))
-                        versionComboBox.setSelectedIndex(j);
+                for (Category category : module.getCategories()) {
+                    categoryComboBox.addItem(category);
+                    if (segment.getCategory().getId().equals(category.getId()))
+                        categoryComboBox.setSelectedIndex(j);
                     j++;
                 }
             }
@@ -258,13 +235,7 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
         if (segment.getId() == null) {
             if (modules.size() > 0) {
                 moduleComboBox.setSelectedIndex(0);
-                List<Version> versions = modules.get(0).getVersions();
-                if (!versions.isEmpty()) {
-                    for (Version version : versions) {
-                        versionComboBox.addItem(version);
-                    }
-                    versionComboBox.setSelectedIndex(0);
-                }
+                categoryComboBox.setSelectedIndex(0);
             }
         }
 
@@ -277,43 +248,8 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
             segment.getUrls().forEach(urlListModel::addElement);
         if (segment.getImgs() != null)
             segmentImgListPanel.addImgs(segment.getImgs());
-        /*
-            类型
-         */
-        dependenceSyntaxComboBox.removeAllItems();
-        contentSyntaxComboBox.removeAllItems();
-        dependenceSyntaxComboBox.addItem(LangType.COMBOBOX_FIRST_SELECT);
-        contentSyntaxComboBox.addItem(LangType.COMBOBOX_FIRST_SELECT);
-        int j = 1;
-        for (LangType value : LangType.values()) {
-            if (value == LangType.COMBOBOX_FIRST_SELECT)
-                continue;
-            dependenceSyntaxComboBox.addItem(value);
-            contentSyntaxComboBox.addItem(value);
 
-            if (segment.getLangDep() == value) {
-                dependenceSyntaxComboBox.setSelectedIndex(j);
-            }
-
-            if (segment.getLangContent() == value) {
-                contentSyntaxComboBox.setSelectedIndex(j);
-            }
-            j++;
-        }
-        /*
-            内容 和 依赖
-         */
-        String langDep = segment.getLangDep() != null ? segment.getLangDep().name() : "java";
-        String langContent = segment.getLangDep() != null ? segment.getLangContent().name() : "java";
-
-        dependenceBox.remove(dependenceTextArea);
-        contentBox.remove(contentTextArea);
-
-        dependenceTextArea = new SegmentEditorTextField(segment.getDependence(), SegmentAppUtils.getProject(), langDep, new Dimension(0, 150));
-        contentTextArea = new SegmentEditorTextField(segment.getContent(), SegmentAppUtils.getProject(), langContent, new Dimension(0, 300));
-
-        dependenceBox.add(dependenceTextArea);
-        contentBox.add(contentTextArea);
+        contentPanelList.refresh();
 
         addControlsEvent();
     }
@@ -327,14 +263,9 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
         int h = 30;
         int w = 150;
         moduleComboBox.setMaximumSize(new Dimension(w, h));
-        versionComboBox.setMaximumSize(new Dimension(w, h));
+        categoryComboBox.setMaximumSize(new Dimension(w, h));
         moduleComboBox.setPreferredSize(new Dimension(w, h));
-        versionComboBox.setPreferredSize(new Dimension(w, h));
-
-        dependenceSyntaxComboBox.setMaximumSize(new Dimension(w, h));
-        contentSyntaxComboBox.setMaximumSize(new Dimension(w, h));
-        dependenceSyntaxComboBox.setPreferredSize(new Dimension(w, h));
-        contentSyntaxComboBox.setPreferredSize(new Dimension(w, h));
+        categoryComboBox.setPreferredSize(new Dimension(w, h));
 
         urlListForAdd.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
@@ -376,17 +307,9 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
         /*
             模块 版本
          */
-        moduleVersionItemListener = new SegmentModuleVersionListener(versionComboBox);
+        moduleVersionItemListener = new SegmentModuleCategoryListener(categoryComboBox);
         moduleComboBox.addItemListener(moduleVersionItemListener);
-        versionComboBox.addItemListener(moduleVersionItemListener);
-
-        /*
-            语法类型
-         */
-        dependenceSyntaxComboListener = new DependenceSyntaxComboListener(dependenceTextArea);
-        contentSyntaxComboListener = new ContentSyntaxComboListener(contentTextArea);
-        dependenceSyntaxComboBox.addItemListener(dependenceSyntaxComboListener);
-        contentSyntaxComboBox.addItemListener(contentSyntaxComboListener);
+        categoryComboBox.addItemListener(moduleVersionItemListener);
 
         /*
             名字 描述 依赖
@@ -395,14 +318,6 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
         nameTextFieldListener = new NameTextFieldListener(nameTextField);
         nameTextField.getDocument().addDocumentListener(nameTextFieldListener);
         descTextField.getDocument().addDocumentListener(descTextFieldListener);
-
-        /*
-            依赖 内容
-         */
-        dependenceTextAreaListener = new DependenceTextAreaListener(dependenceTextArea);
-        contentTextAreaListener = new ContentTextAreaListener(contentTextArea);
-        dependenceTextArea.getDocument().addDocumentListener(dependenceTextAreaListener);
-        contentTextArea.getDocument().addDocumentListener(contentTextAreaListener);
     }
 
     private void removeControlEvent() {
@@ -410,27 +325,13 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
             模块 版本
          */
         moduleComboBox.removeItemListener(moduleVersionItemListener);
-        versionComboBox.removeItemListener(moduleVersionItemListener);
-
-        /*
-            依赖类型 内容类型
-         */
-        dependenceSyntaxComboBox.removeItemListener(dependenceSyntaxComboListener);
-        contentSyntaxComboBox.removeItemListener(contentSyntaxComboListener);
+        categoryComboBox.removeItemListener(moduleVersionItemListener);
 
         /*
             名字 描述 依赖
          */
         nameTextField.getDocument().removeDocumentListener(nameTextFieldListener);
         descTextField.getDocument().removeDocumentListener(descTextFieldListener);
-
-        /*
-            依赖 内容
-         */
-        if (dependenceTextAreaListener != null)
-            dependenceTextArea.getDocument().removeDocumentListener(dependenceTextAreaListener);
-        if (contentTextAreaListener != null)
-            contentTextArea.getDocument().removeDocumentListener(contentTextAreaListener);
     }
 
     public void clear() {
@@ -445,32 +346,29 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
         List<Module> modules = new ModuleAction().list();
 
         moduleComboBox.removeAllItems();
-        versionComboBox.removeAllItems();
+        categoryComboBox.removeAllItems();
         moduleComboBox.addItem(new Module().setName(COMBOBOX_FIRST_SELECT));
-        versionComboBox.addItem(new Version().setName(COMBOBOX_FIRST_SELECT));
+        categoryComboBox.addItem(new Category().setName(COMBOBOX_FIRST_SELECT));
         for (Module module : modules) {
             moduleComboBox.addItem(module);
         }
         if (modules.size() > 0) {
             moduleComboBox.setSelectedIndex(0);
-            for (Version version : modules.get(0).getVersions()) {
-                versionComboBox.addItem(version);
+            for (Category category : modules.get(0).getCategories()) {
+                categoryComboBox.addItem(category);
             }
-            if (modules.get(0).getVersions().size() > 0) {
-                versionComboBox.setSelectedIndex(0);
+            if (modules.get(0).getCategories().size() > 0) {
+                categoryComboBox.setSelectedIndex(0);
             }
         }
-
-        dependenceSyntaxComboBox.setSelectedIndex(0);
-        contentSyntaxComboBox.setSelectedIndex(0);
 
         nameTextField.setText("");
         descTextField.setText("");
 
-        contentTextArea.setText("");
-        dependenceTextArea.setText("");
+        contentPanelList.refresh();
 
         body.repaint();
+
         scrollPane.scrollRectToVisible(new Rectangle(0, 0));
 
         addControlsEvent();

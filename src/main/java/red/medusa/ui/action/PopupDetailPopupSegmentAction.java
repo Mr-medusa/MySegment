@@ -21,7 +21,7 @@ public class PopupDetailPopupSegmentAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        new SegmentDetailDialog().show();
+        new SegmentDetailDialog(null).show();
     }
 }
 

@@ -1,7 +1,7 @@
 package red.medusa.service.config;
 
 import lombok.extern.slf4j.Slf4j;
-import red.medusa.service.entity.BaseEntity;
+import red.medusa.service.entity.Segment;
 
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -14,12 +14,12 @@ import java.util.Date;
 @Slf4j
 public class Audit {
     @PreUpdate
-    public void setLastUpdate(BaseEntity o) {
+    public void setLastUpdate(Segment o) {
         o.setUpdateTime(new Date());
     }
 
     @PrePersist
-    public void setCreateTime(BaseEntity o) {
+    public void setCreateTime(Segment o) {
         o.setUpdateTime(new Date());
         o.setCreateTime(new Date());
     }
