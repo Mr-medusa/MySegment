@@ -7,7 +7,10 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.ContentManager;
 import lombok.extern.slf4j.Slf4j;
 import red.medusa.intellij.ui.SegmentComponent;
-import red.medusa.service.entity.*;
+import red.medusa.service.entity.Category;
+import red.medusa.service.entity.Module;
+import red.medusa.service.entity.Segment;
+import red.medusa.service.entity.Url;
 import red.medusa.ui.context.SegmentContextHolder;
 import red.medusa.ui.controls.SegmentImageBrowserButton;
 import red.medusa.ui.controls.SegmentLabel;
@@ -220,7 +223,7 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
                 moduleComboBox.setSelectedIndex(i);
                 // 版本从当前模块获取
                 int j = 1;
-                for (Category category : segment.getModule().getCategories()) {
+                for (Category category : module.getCategories()) {
                     categoryComboBox.addItem(category);
                     if (segment.getCategory().getId().equals(category.getId()))
                         categoryComboBox.setSelectedIndex(j);
