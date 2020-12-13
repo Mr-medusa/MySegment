@@ -4,7 +4,6 @@ plugins {
 
 group 'red.medusa'
 version 'v1.2'
-buildDir 'devBuild'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
