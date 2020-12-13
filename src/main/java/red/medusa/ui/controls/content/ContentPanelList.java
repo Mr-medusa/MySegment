@@ -43,7 +43,7 @@ public class ContentPanelList extends Box {
         boolean first = true;
         for (Content content : contents) {
             if (first) {
-                addContentWidthHeight(content, 400);
+                addContentWidthHeight(content, 350);
                 first = false;
             } else {
                 this.addContent(content);
