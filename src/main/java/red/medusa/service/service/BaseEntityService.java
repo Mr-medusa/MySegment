@@ -22,19 +22,20 @@ import java.util.function.Function;
 @Slf4j
 public abstract class BaseEntityService {
     private static EntityManagerFactory emf;
-    private static EntityManager readEntityManager;
 
     //-------------------------------------- query ----------------------------------------------
     public <T> T find(Long id, Class<T> tClass) {
-        T t = readEntityManager.find(tClass, id);
-        readEntityManager.clear();
+        EntityManager entityManager = emf.createEntityManager();
+        T t = entityManager.find(tClass, id);
+        entityManager.close();
         return t;
     }
 
     @SuppressWarnings("all")
     public <T> List<T> list(Class<T> tClass) {
-        List<T> resultList = readEntityManager.createQuery("from " + tClass.getSimpleName()).getResultList();
-        readEntityManager.clear();
+        EntityManager entityManager = emf.createEntityManager();
+        List<T> resultList = entityManager.createQuery("from " + tClass.getSimpleName()).getResultList();
+        entityManager.close();
         return resultList;
     }
 
@@ -42,7 +43,10 @@ public abstract class BaseEntityService {
        自定义查询
     */
     public <T> List<T> list(Function<EntityManager, List<T>> function) {
-        return function.apply(readEntityManager);
+        EntityManager entityManager = emf.createEntityManager();
+        List<T> apply = function.apply(entityManager);
+        entityManager.close();
+        return apply;
     }
 
     //----------------------------------------- update -------------------------------------------
@@ -111,13 +115,13 @@ public abstract class BaseEntityService {
         log.info("MySegment EntityManagerFactory service is open = {}", emf.isOpen());
 
         // 预加载一个读的 EntityManager
-        readEntityManager = emf.createEntityManager();
+        // readEntityManager = emf.createEntityManager();
     }
 
     public void finishService() {
         if (emf != null && emf.isOpen()) {
             log.info("MySegment EntityManagerFactory is finishing...");
-            readEntityManager.close();
+            // readEntityManager.close();
             emf.close();
             log.info("MySegment EntityManagerFactory service is open = {}", emf.isOpen());
         }

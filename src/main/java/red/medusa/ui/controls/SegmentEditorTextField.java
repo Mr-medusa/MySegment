@@ -19,37 +19,23 @@ import java.awt.*;
  */
 public class SegmentEditorTextField extends EditorTextField {
 
-    public SegmentEditorTextField(String text, Project project, String fileType, Dimension dimension) {
-        super(text != null ? text : "", project, findFileType(fileType));
-        this.setPreferredSize(dimension);
-        this.setMaximumSize(new Dimension(Integer.MAX_VALUE, dimension.height));
-        this.setOneLineMode(false);
-    }
+    private final int orientation;
 
-    public SegmentEditorTextField(String text, Project project, String fileType, Dimension dimension, boolean readOnly) {
-        super(text, project, findFileType(fileType));
-        this.setPreferredSize(dimension);
-        this.setMaximumSize(new Dimension(Integer.MAX_VALUE, dimension.height));
-        this.setOneLineMode(false);
-        this.getDocument().setReadOnly(readOnly);
+    public SegmentEditorTextField(String text, Project project, String fileType, int minimumHeight, boolean readOnly) {
+        this(text, project, fileType, new Dimension(0, minimumHeight), readOnly, EditorEx.VERTICAL_SCROLLBAR_LEFT);
     }
-
-    private int orientation = EditorEx.VERTICAL_SCROLLBAR_LEFT;
 
     public SegmentEditorTextField(String text, Project project, String fileType, Dimension dimension, boolean readOnly, int orientation) {
-        super(text, project, findFileType(fileType));
+        super(text != null ? text : "", project, findFileType(fileType));
+        // 设置一个合适的高度
         this.setPreferredSize(dimension);
-        this.setMaximumSize(new Dimension(Integer.MAX_VALUE, dimension.height));
         this.setOneLineMode(false);
         this.getDocument().setReadOnly(readOnly);
         this.orientation = orientation;
     }
 
-    /*
-
-     */
     public static FileType findFileType(String fileExe) {
-        fileExe = fileExe != null ? fileExe : LangType.JAVA.name();
+        fileExe = fileExe != null ? fileExe : LangType.JAVA.value;
         FileTypeManagerImpl service = (FileTypeManagerImpl) FileTypeManager.getInstance();
         return service.getFileTypeByExtension(fileExe);
     }
