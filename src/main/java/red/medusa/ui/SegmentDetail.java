@@ -1,18 +1,16 @@
 package red.medusa.ui;
 
 import com.intellij.ide.BrowserUtil;
-import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
 import lombok.extern.slf4j.Slf4j;
 import red.medusa.intellij.ui.SegmentComponent;
-import red.medusa.intellij.utils.SegmentAppUtils;
 import red.medusa.service.entity.Img;
 import red.medusa.service.entity.Segment;
 import red.medusa.service.entity.Url;
-import red.medusa.ui.controls.SegmentEditorTextField;
 import red.medusa.ui.controls.SegmentLabel;
 import red.medusa.ui.controls.SegmentLabel2;
+import red.medusa.ui.controls.content.ContentPanelListDetail;
 import red.medusa.ui.segment_action.SegmentAction;
 import red.medusa.utils.DateUtils;
 
@@ -36,17 +34,11 @@ public class SegmentDetail implements SegmentComponent {
     private final SegmentLabel2 nameLabel = new SegmentLabel2();
     private final JTextArea descLabel = new JTextArea();
 
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //+++++++++++++++++++++++++++++++++++++      Editor            ++++++++++++++++++++++++++++++++++++++++++++++
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    private EditorTextField dependenceTextArea = new SegmentEditorTextField("", SegmentAppUtils.getProject(), null, new Dimension(0, 150), true);
-    private EditorTextField contentTextArea = new SegmentEditorTextField("", SegmentAppUtils.getProject(), null, new Dimension(0, 300), true);
-
     private final SegmentLabel2 createTimeLabel = new SegmentLabel2();
     private final SegmentLabel2 updateTimeLabel = new SegmentLabel2();
 
     private final SegmentLabel2 moduleLabel = new SegmentLabel2();
-    private final SegmentLabel2 versionLabel = new SegmentLabel2();
+    private final SegmentLabel2 categoryLabel = new SegmentLabel2();
 
 
     private final Box urlBoxForAdd = Box.createVerticalBox();
@@ -64,10 +56,8 @@ public class SegmentDetail implements SegmentComponent {
     // 链接 链接
     private final Box urlBox = Box.createHorizontalBox();
     private final Box imgBox = Box.createHorizontalBox();
-    // 依赖
-    private final Box dependenceBox = Box.createHorizontalBox();
     // 内容
-    private final Box contentBox = Box.createHorizontalBox();
+    private final ContentPanelListDetail contentPanelListDetail = new ContentPanelListDetail();
     // 时间
     private final Box timeBox = Box.createHorizontalBox();
 
@@ -110,12 +100,9 @@ public class SegmentDetail implements SegmentComponent {
         body.add(Box.createVerticalStrut(strut));
         body.add(new JSeparator());
         body.add(Box.createVerticalStrut(strut));
-        body.add(contentBox);
+        body.add(contentPanelListDetail);
 
-        body.add(Box.createVerticalStrut(strut));
-        body.add(new JSeparator());
-        body.add(Box.createVerticalStrut(strut));
-        body.add(dependenceBox);
+        body.add(Box.createVerticalGlue());
     }
 
     private void fillFrameContent() {
@@ -124,12 +111,6 @@ public class SegmentDetail implements SegmentComponent {
 
         descBox.add(new SegmentLabel("描述"));
         descBox.add(descLabel);
-
-        dependenceBox.add(new SegmentLabel("依赖"));
-        dependenceBox.add(dependenceTextArea);
-
-        contentBox.add(new SegmentLabel("内容"));
-        contentBox.add(contentTextArea);
 
         /*
             URL 列表
@@ -152,7 +133,7 @@ public class SegmentDetail implements SegmentComponent {
         this.moduleVersionBox.add(new SegmentLabel("模块"));
         this.moduleVersionBox.add(moduleLabel);
         this.moduleVersionBox.add(new SegmentLabel("版本"));
-        this.moduleVersionBox.add(versionLabel);
+        this.moduleVersionBox.add(categoryLabel);
 
         timeBox.add(new SegmentLabel("创建时间", 80));
         timeBox.add(createTimeLabel);
@@ -169,7 +150,7 @@ public class SegmentDetail implements SegmentComponent {
         createTimeLabel.setText(DateUtils.dateTime(segment.getCreateTime()));
         updateTimeLabel.setText(DateUtils.dateTime(segment.getUpdateTime()));
         moduleLabel.setText(segment.getModule() != null ? segment.getModule().toString() : "");
-        versionLabel.setText(segment.getVersion() != null ? segment.getVersion().toString() : "");
+        categoryLabel.setText(segment.getCategory() != null ? segment.getCategory().toString() : "");
 
         urlBoxForAdd.removeAll();
         if (!(segment.getUrls() == null || segment.getUrls().isEmpty())) {
@@ -198,21 +179,8 @@ public class SegmentDetail implements SegmentComponent {
                     imgBoxForAdd.add(Box.createVerticalStrut(10));
             }
         }
-         /*
-            内容 和 依赖
-         */
 
-        dependenceBox.remove(dependenceTextArea);
-        contentBox.remove(contentTextArea);
-
-        String langDep = segment.getLangDep() != null ? segment.getLangDep().name() : "java";
-        String langContent = segment.getLangDep() != null ? segment.getLangContent().name() : "java";
-        dependenceTextArea = new SegmentEditorTextField(segment.getDependence() != null ? segment.getDependence() : "", SegmentAppUtils.getProject(), langDep, new Dimension(0, 150), true);
-        contentTextArea = new SegmentEditorTextField(segment.getContent() != null ? segment.getContent() : "", SegmentAppUtils.getProject(), langContent, new Dimension(0, 300), true);
-
-        dependenceBox.add(dependenceTextArea);
-        contentBox.add(contentTextArea);
-
+        this.contentPanelListDetail.refresh();
     }
 
 

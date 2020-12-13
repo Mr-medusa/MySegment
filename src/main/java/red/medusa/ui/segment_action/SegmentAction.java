@@ -20,7 +20,7 @@ public class SegmentAction extends SegmentEventAction<Segment> {
     @Override
     public List<Object[]> list() {
         Function<EntityManager, List<Object[]>> function = entityManager -> {
-            String sql = "select s.name,m.name as mName,s.id from segment s left join module m on s.module_id=m.id order by m.id,s.version_id,s.id";
+            String sql = "select s.name,m.name as mName,s.id from segment s left join module m on s.module_id=m.id order by m.id,s.category_id,s.id";
             List<Object[]> list = entityManager.createNativeQuery(sql).getResultList();
             entityManager.clear();
             return list;
@@ -44,5 +44,10 @@ public class SegmentAction extends SegmentEventAction<Segment> {
     public void deleteSegment() {
         delete(SegmentContextHolder.getSegment());
         SegmentContextHolder.setSegment(new Segment());
+    }
+
+    public void merge(Segment segment) {
+        Segment mergedSegment = segmentEntityService.merge(segment);
+        SegmentContextHolder.setSegment(mergedSegment);
     }
 }

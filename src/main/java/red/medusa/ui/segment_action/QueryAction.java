@@ -24,10 +24,10 @@ public class QueryAction {
         this.segmentTableModel = segmentTable.getSegmentTableModel();
     }
 
-    private final static String KEYWORD_SQL = "select s.name,m.name as mName,s.id from " +
-            "segment s inner join module m on s.module_id=m.id " +
-            "where s.name like ?1 or s.description like ?1 or s.dependence like ?1 or s.content like ?1" +
-            " order by m.id,s.version_id,s.id";
+    private final static String KEYWORD_SQL = "select s.name,m.name as mName,s.id from" +
+            " segment s inner join module m on s.module_id=m.id" +
+            " where s.name like ?1 or s.description like ?1" +
+            " order by m.id,s.category_id,s.id";
 
     public void queryByKeyword(String keyword) {
         Function<EntityManager, List<Object[]>> function = entityManager -> {
@@ -43,7 +43,7 @@ public class QueryAction {
     private final static String MODULE_SQL =
             "select s.name,m.name as mName,s.id from " +
                     "segment s inner join module m on s.module_id=m.id " +
-                    "where m.id=?1 order by s.version_id ,s.id";
+                    "where m.id=?1 order by s.category_id ,s.id";
 
     public void queryByModule(Long moduleId) {
         if (moduleId == null)
@@ -58,16 +58,16 @@ public class QueryAction {
         doQuery(function);
     }
 
-    private final static String VERSION_SQL = "select s.name,m.name as mName,s.id from " +
-            "segment s inner join module m on s.module_id=m.id where m.id=?1 and s.version_id=?2 order by s.id";
+    private final static String CATEGORY_SQL = "select s.name,m.name as mName,s.id from " +
+            "segment s inner join module m on s.module_id=m.id where m.id=?1 and s.category_id=?2 order by s.id";
 
-    public void queryByVersion(Long moduleId, Long versionId) {
-        if (moduleId == null || versionId == null)
+    public void queryByCategory(Long moduleId, Long categoryId) {
+        if (moduleId == null || categoryId == null)
             return;
         Function<EntityManager, List<Object[]>> function = entityManager -> {
-            Query query = entityManager.createNativeQuery(VERSION_SQL);
+            Query query = entityManager.createNativeQuery(CATEGORY_SQL);
             query.setParameter(1, moduleId);
-            query.setParameter(2, versionId);
+            query.setParameter(2, categoryId);
             List<Object[]> resultList = query.getResultList();
             entityManager.clear();
             return resultList;

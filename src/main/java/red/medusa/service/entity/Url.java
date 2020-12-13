@@ -16,11 +16,8 @@ import javax.persistence.Entity;
 @EqualsAndHashCode(callSuper = true)
 public class Url extends BaseEntity {
     private String url;
-
     @Override
     public String toString() {
         return url;
     }
-
-
 }
