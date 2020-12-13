@@ -9,14 +9,14 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.components.JBScrollPane;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import red.medusa.service.entity.Category;
 import red.medusa.service.entity.Module;
 import red.medusa.service.entity.Segment;
-import red.medusa.service.entity.Version;
 import red.medusa.ui.action.*;
 import red.medusa.ui.context.SegmentContextHolder;
+import red.medusa.ui.controls.table.SegmentTable;
 import red.medusa.ui.segment_action.ModuleAction;
 import red.medusa.ui.segment_action.QueryAction;
-import red.medusa.ui.controls.table.SegmentTable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -42,7 +42,7 @@ public class SegmentHome extends SegmentSwitchableBranchDialog {
 
     private final static String MODULE_VERSION_FIRST_SELECT = " -请选择- ";
     private final ComboBox<Module> modelComboBox = new ComboBox<>();
-    private final ComboBox<Version> versionComboBox = new ComboBox<>();
+    private final ComboBox<Category> categoryComboBox = new ComboBox<>();
     private final JTextField keyWord = new JTextField();
     private final JButton refresh = new JButton("刷新");
 
@@ -88,7 +88,7 @@ public class SegmentHome extends SegmentSwitchableBranchDialog {
     private void fillFrameContent() {
         // header
         header.add(modelComboBox);
-        header.add(versionComboBox);
+        header.add(categoryComboBox);
         // content
         content.add(scrollPaneForTable, BorderLayout.CENTER);
         // footer
@@ -130,7 +130,7 @@ public class SegmentHome extends SegmentSwitchableBranchDialog {
 
                     if (e.getButton() == 1 && e.isControlDown()) {
                         SegmentContextHolder.setSegment((Segment) new Segment().setId(Long.parseLong(o.toString())));
-                        new SegmentDetailDialog().show();
+                        new SegmentDetailDialog(null).show();
                     } else if (e.getButton() == 3) {
                         SegmentContextHolder.setSegment((Segment) new Segment().setId(Long.parseLong(o.toString())));
                         popupInvoked(e.getComponent(), e.getPoint().x, e.getPoint().y, row);
@@ -149,13 +149,13 @@ public class SegmentHome extends SegmentSwitchableBranchDialog {
 
         keyWord.getDocument().addDocumentListener(keywordListener);
         modelComboBox.addItemListener(moduleListener);
-        versionComboBox.addItemListener(versionListener);
+        categoryComboBox.addItemListener(versionListener);
     }
 
     public void removeControlsEventLister() {
         keyWord.getDocument().removeDocumentListener(keywordListener);
         modelComboBox.removeItemListener(moduleListener);
-        versionComboBox.removeItemListener(versionListener);
+        categoryComboBox.removeItemListener(versionListener);
     }
 
 
@@ -176,22 +176,20 @@ public class SegmentHome extends SegmentSwitchableBranchDialog {
          */
         List<Module> modules = new ModuleAction().list();
         modelComboBox.removeAllItems();
-        versionComboBox.removeAllItems();
+        categoryComboBox.removeAllItems();
         modelComboBox.addItem(new Module().setName(MODULE_VERSION_FIRST_SELECT));
-        versionComboBox.addItem(new Version().setName(MODULE_VERSION_FIRST_SELECT));
+        categoryComboBox.addItem(new Category().setName(MODULE_VERSION_FIRST_SELECT));
         for (Module module : modules) {
             modelComboBox.addItem(module);
         }
-        if (modules.size() > 0) {
-            List<Version> versions = modules.get(0).getVersions();
-            if (versions != null) {
-                if (!versions.isEmpty()) {
-                    for (Version version : versions) {
-                        versionComboBox.addItem(version);
-                    }
-                }
-            }
-        }
+//        if (modules.size() > 0) {
+//            List<Category> categories = modules.get(0).getCategories();
+//            if (!categories.isEmpty()) {
+//                for (Category category : categories) {
+//                    categoryComboBox.addItem(category);
+//                }
+//            }
+//        }
 
         SegmentContextHolder.setSegment(new Segment());
         table.refresh();
@@ -207,16 +205,16 @@ public class SegmentHome extends SegmentSwitchableBranchDialog {
         public void itemStateChanged(ItemEvent e) {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 Module module = (Module) modelComboBox.getSelectedItem();
-                Version version = (Version) versionComboBox.getSelectedItem();
+                Category category = (Category) categoryComboBox.getSelectedItem();
                 if (module.getName().equals(MODULE_VERSION_FIRST_SELECT)) {
                     refresh2();
                     return;
                 }
-                if (version.getName().equals(MODULE_VERSION_FIRST_SELECT)) {
+                if (category.getName().equals(MODULE_VERSION_FIRST_SELECT)) {
                     queryAction.queryByModule(module.getId());
                     return;
                 }
-                queryAction.queryByVersion(module.getId(), version.getId());
+                queryAction.queryByCategory(module.getId(), category.getId());
             }
         }
     }
@@ -231,13 +229,12 @@ public class SegmentHome extends SegmentSwitchableBranchDialog {
                     return;
                 }
 
-                versionComboBox.removeAllItems();
-                versionComboBox.addItem(new Version().setName(MODULE_VERSION_FIRST_SELECT));
+                categoryComboBox.removeAllItems();
+                categoryComboBox.addItem(new Category().setName(MODULE_VERSION_FIRST_SELECT));
 
-                if (module.getVersions() != null)
-                    for (Version version : module.getVersions()) {
-                        versionComboBox.addItem(version);
-                    }
+                for (Category category : module.getCategories()) {
+                    categoryComboBox.addItem(category);
+                }
                 queryAction.queryByModule(module.getId());
             }
         }
