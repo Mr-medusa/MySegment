@@ -105,7 +105,7 @@ public class ContentPanel extends Box {
         });
         this.textField.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
-            protected void textChanged(javax.swing.event.@NotNull DocumentEvent e) {
+            protected void textChanged(javax.swing.event.DocumentEvent e) {
                 String text = textField.getText();
                 content.setLangType((LangType) comboBox.getSelectedItem());
                 content.setTitle(text.equals(tip) ? "" : text);
