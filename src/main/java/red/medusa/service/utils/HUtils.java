@@ -12,4 +12,15 @@ public class HUtils {
     public static EntityManager createEntityManager() {
         return emf.createEntityManager();
     }
+    public static void begin(EntityManager entityManager){
+        entityManager.getTransaction().begin();
+    }
+    public static void commit(EntityManager entityManager){
+        entityManager.getTransaction().commit();
+    }
+    public static void commitWithClose(EntityManager entityManager){
+        entityManager.getTransaction().commit();
+        entityManager.close();
+    }
+
 }

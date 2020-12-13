@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Entity
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-public class Version extends BaseEntity {
+public class Category extends BaseEntity {
 
     private String name;
 

@@ -4,11 +4,11 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import lombok.extern.slf4j.Slf4j;
 import red.medusa.intellij.ui.SegmentComponent;
+import red.medusa.service.entity.Category;
 import red.medusa.service.entity.Module;
-import red.medusa.service.entity.Version;
 import red.medusa.ui.controls.SegmentLabel;
+import red.medusa.ui.segment_action.CategoryAction;
 import red.medusa.ui.segment_action.ModuleAction;
-import red.medusa.ui.segment_action.VersionAction;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -39,10 +39,10 @@ public class SegmentModule implements ActionListener, SegmentComponent {
         model
      */
     private final DefaultListModel<Module> moduleModel = new DefaultListModel<>();
-    private final DefaultListModel<Version> versionModel = new DefaultListModel<>();
+    private final DefaultListModel<Category> categoryListModel = new DefaultListModel<>();
 
     private final JBList<Module> moduleList = new JBList<>();
-    private final JBList<Version> versionList = new JBList<>();
+    private final JBList<Category> categoryList = new JBList<>();
 
     /*
         button
@@ -69,18 +69,18 @@ public class SegmentModule implements ActionListener, SegmentComponent {
     public void refresh() {
         List<Module> modules = new ModuleAction().list();
         moduleModel.removeAllElements();
-        versionModel.removeAllElements();
+        categoryListModel.removeAllElements();
         for (Module module : modules) {
             moduleModel.add(moduleModel.size(), module);
         }
         if (modules.size() > 0) {
             moduleList.setSelectedIndex(0);
-            List<Version> versions = modules.get(0).getVersions();
-            if (versions != null && !versions.isEmpty()) {
-                for (Version version : versions) {
-                    versionModel.add(versionModel.size(), version);
+            List<Category> categories = modules.get(0).getCategories();
+            if (categories != null && !categories.isEmpty()) {
+                for (Category category : categories) {
+                    categoryListModel.add(categoryListModel.size(), category);
                 }
-                versionList.setSelectedIndex(0);
+                categoryList.setSelectedIndex(0);
             }
         }
     }
@@ -110,16 +110,16 @@ public class SegmentModule implements ActionListener, SegmentComponent {
         moduleBox.add(moduleList);
 
         versionBox.add(new SegmentLabel("版本"));
-        versionBox.add(versionList);
+        versionBox.add(categoryList);
     }
 
     private void initControlsProp() {
         addText.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
         moduleList.setModel(moduleModel);
-        versionList.setModel(versionModel);
+        categoryList.setModel(categoryListModel);
         moduleList.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
-        versionList.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        categoryList.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
     }
 
 
@@ -128,13 +128,13 @@ public class SegmentModule implements ActionListener, SegmentComponent {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) {
-                    versionModel.clear();
+                    categoryListModel.clear();
                     Module module = moduleList.getSelectedValue();
-                    for (Version version : module.getVersions()) {
-                        versionModel.add(versionModel.size(), version);
+                    for (Category category : module.getCategories()) {
+                        categoryListModel.add(categoryListModel.size(), category);
                     }
-                    if (module.getVersions() != null && !module.getVersions().isEmpty()) {
-                        versionList.setSelectedIndex(0);
+                    if (module.getCategories() != null && !module.getCategories().isEmpty()) {
+                        categoryList.setSelectedIndex(0);
                     }
                 }
             }
@@ -167,7 +167,7 @@ public class SegmentModule implements ActionListener, SegmentComponent {
             case DELETE_MODULE:
                 Module delModule = moduleList.getSelectedValue();
                 if (delModule != null) {
-                    if (versionModel.isEmpty()) {
+                    if (categoryListModel.isEmpty()) {
                         new ModuleAction().delete(delModule);
 
                         moduleModel.remove(moduleList.getSelectedIndex());
@@ -186,25 +186,25 @@ public class SegmentModule implements ActionListener, SegmentComponent {
                     break;
                 }
                 if (text != null && text.trim().length() > 0) {
-                    Version newVersion = new Version().setModule(module).setName(text);
-                    module.getVersions().add(newVersion);
+                    Category newCategory = new Category().setModule(module).setName(text);
+                    module.getCategories().add(newCategory);
 
-                    versionModel.add(0, newVersion);
-                    versionList.setSelectedIndex(versionModel.getSize() - 1);
+                    categoryListModel.add(0, newCategory);
+                    categoryList.setSelectedIndex(categoryListModel.getSize() - 1);
 
-                    new VersionAction().persist(newVersion);
+                    new CategoryAction().persist(newCategory);
                 }
                 break;
             case DELETE_VERSION:
-                Version version = versionList.getSelectedValue();
-                if (version != null) {
-                    new VersionAction().delete(version);
+                Category category = categoryList.getSelectedValue();
+                if (category != null) {
+                    new CategoryAction().delete(category);
 
                     Module m = moduleList.getSelectedValue();
-                    m.getVersions().remove(version);
-                    versionModel.remove(versionList.getSelectedIndex());
-                    if (!versionModel.isEmpty()) {
-                        versionList.setSelectedIndex(0);
+                    m.getCategories().remove(category);
+                    categoryListModel.remove(categoryList.getSelectedIndex());
+                    if (!categoryListModel.isEmpty()) {
+                        categoryList.setSelectedIndex(0);
                     }
                 }
                 break;

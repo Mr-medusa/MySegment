@@ -20,8 +20,8 @@ public class Module extends BaseEntity {
     private String name;
 
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "module")
-    @OrderBy("createTime DESC")
-    private List<Version> versions = new ArrayList<>();
+    @OrderBy("id asc")
+    private List<Category> categories = new ArrayList<>();
 
     @Override
     public String toString() {
