@@ -193,10 +193,14 @@ public class ContentPanel extends Box {
     }
 
     private void initCombobox() {
+        int i=0;
         for (LangType langType : LangType.values()) {
             comboBox.addItem(langType);
+            if (content != null && content.getLangType() == langType) {
+                comboBox.setSelectedIndex(i);
+            }
+            i++;
         }
-        comboBox.setSelectedIndex(0);
     }
 }
 
