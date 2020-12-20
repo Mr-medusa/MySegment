@@ -13,12 +13,15 @@ public enum LangType {
     TXT("txt"),
     SQL("sql"),
     HTML("html"),
+    TYPESCRIPT("ts"),
+    CSS("css"),
+    SASS("scss"),
+    VUE("vue"),
     KOTLIN("kt"),
     GO("go"),
-    C("c"),
-    CSS("css"),
     MARKDOWN("md"),
     SHELL("sh"),
+    C("c"),
     DOCKERFILE("Dockerfile");
     public String value;
 
