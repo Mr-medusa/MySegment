@@ -150,7 +150,7 @@ public class SegmentDetail implements SegmentComponent {
         createTimeLabel.setText(DateUtils.dateTime(segment.getCreateTime()));
         updateTimeLabel.setText(DateUtils.dateTime(segment.getUpdateTime()));
         moduleLabel.setText(segment.getModule() != null ? segment.getModule().toString() : "");
-        categoryLabel.setText(segment.getCategory() != null ? segment.getCategory().toString() : "");
+        categoryLabel.setText(segment.getCategory() != null ? segment.getCategory().toString() : "N/A");
 
         urlBoxForAdd.removeAll();
         if (!(segment.getUrls() == null || segment.getUrls().isEmpty())) {
