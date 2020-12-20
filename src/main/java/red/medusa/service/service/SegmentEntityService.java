@@ -12,7 +12,7 @@ import red.medusa.ui.context.SegmentContextHolder;
 @Slf4j
 public class SegmentEntityService extends BaseEntityService {
 
-    private final DebounceWorker debounceWorker = new DebounceWorker(3000);
+    private final DebounceWorker debounceWorker = new DebounceWorker(2000);
 
     public SegmentEntityService() {
     }
@@ -25,7 +25,7 @@ public class SegmentEntityService extends BaseEntityService {
                 // NotifyUtils.notifyWarning("名字不能为空!");
                 return;
             }
-            if (segment.getModule() == null || segment.getCategory() == null) {
+            if (segment.getModule() == null) {
 //                NotifyUtils.notifyWarning("请先选择模块或版本!");
                 return;
             }

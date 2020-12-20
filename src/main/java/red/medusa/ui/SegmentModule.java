@@ -109,7 +109,7 @@ public class SegmentModule implements ActionListener, SegmentComponent {
         moduleBox.add(new SegmentLabel("模块"));
         moduleBox.add(moduleList);
 
-        versionBox.add(new SegmentLabel("版本"));
+        versionBox.add(new SegmentLabel("分类"));
         versionBox.add(categoryList);
     }
 
