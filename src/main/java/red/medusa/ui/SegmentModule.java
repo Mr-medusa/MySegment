@@ -161,6 +161,8 @@ public class SegmentModule implements ActionListener, SegmentComponent {
                     Module newModule = new Module().setName(text);
                     moduleModel.add(moduleModel.size(), newModule);
                     moduleList.setSelectedIndex(moduleModel.size() - 1);
+
+                    categoryListModel.removeAllElements();
                     new ModuleAction().persist(newModule);
                 }
                 break;
