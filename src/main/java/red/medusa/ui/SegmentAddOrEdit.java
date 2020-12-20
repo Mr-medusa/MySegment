@@ -225,7 +225,7 @@ public class SegmentAddOrEdit extends MouseAdapter implements SegmentComponent {
                 int j = 1;
                 for (Category category : module.getCategories()) {
                     categoryComboBox.addItem(category);
-                    if (segment.getCategory().getId().equals(category.getId()))
+                    if (segment.getCategory() !=null && segment.getCategory().getId().equals(category.getId()))
                         categoryComboBox.setSelectedIndex(j);
                     j++;
                 }

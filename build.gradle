@@ -5,25 +5,17 @@ plugins {
 group 'red.medusa'
 version 'v1.2'
 
-buildDir 'AndroidBuild'
-
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 intellij {
-    version '201.8743.12'
-    type 'IC'
-    plugins 'android'
+    version '2020.2.3'
     intellij.updateSinceUntilBuild false
-}
-
-runIde {
-    ideDirectory 'E:\\IDE\\AndroidStudio'
-//    jbrVersion 'jbr-11_0_8b944.34'
 }
 
 repositories {
     maven { url "https://www.jetbrains.com/intellij-repository/releases" }
+    maven { url "https://jetbrains.bintray.com/intellij-third-party-dependencies" }
     mavenCentral()
 }
 

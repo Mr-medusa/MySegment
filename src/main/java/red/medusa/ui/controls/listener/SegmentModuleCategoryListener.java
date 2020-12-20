@@ -14,7 +14,7 @@ import java.awt.event.ItemListener;
  * @author huguanghui
  * @since 2020/12/01 周二
  */
-public class SegmentModuleCategoryListener implements ItemListener ,DebounceWorkAction{
+public class SegmentModuleCategoryListener implements ItemListener, DebounceWorkAction {
     private final ComboBox<Category> categoryComboBox;
 
     public SegmentModuleCategoryListener(ComboBox<Category> categoryComboBox) {
@@ -31,7 +31,7 @@ public class SegmentModuleCategoryListener implements ItemListener ,DebounceWork
                 Module module = (Module) e.getItem();
                 categoryComboBox.removeAllItems();
                 categoryComboBox.addItem(new Category().setName(SegmentAddOrEdit.COMBOBOX_FIRST_SELECT));
-                if(module.getName().equals(SegmentAddOrEdit.COMBOBOX_FIRST_SELECT)){
+                if (module.getName().equals(SegmentAddOrEdit.COMBOBOX_FIRST_SELECT)) {
                     return;
                 }
                 for (Category category : module.getCategories()) {
@@ -41,10 +41,11 @@ public class SegmentModuleCategoryListener implements ItemListener ,DebounceWork
                 segment.setModule(module);
             } else {
                 Category category = (Category) e.getItem();
-                if(category.getName().equals(SegmentAddOrEdit.COMBOBOX_FIRST_SELECT)){
-                    return;
+                if (category.getName().equals(SegmentAddOrEdit.COMBOBOX_FIRST_SELECT)) {
+                    segment.setCategory(null);
+                } else {
+                    segment.setCategory(category);
                 }
-                segment.setCategory(category);
                 this.work();
             }
         }
