@@ -51,15 +51,17 @@ public class SegmentGithubTask {
     public void projectClosed() {
         try {
             boolean mayBeNeedPush = false;
-            if (appSettingsState.autoCommit)
+            if (appSettingsState.autoCommit){
+                log.info("commit...");
                 mayBeNeedPush = githubService.commitFile();
-
+            }
             if (appSettingsState.useGithub && appSettingsState.autoPush && mayBeNeedPush) {
                 log.info("push...");
                 githubService.push();
             }
             githubService.clear();
         } catch (Exception e) {
+            log.info("commit or push failure...");
             e.printStackTrace();
         }
     }

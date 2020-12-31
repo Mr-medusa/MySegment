@@ -104,7 +104,7 @@ public abstract class BaseEntityService {
         if (emf != null && emf.isOpen())
             finishService();
         String dbUrl = dbUrl();
-        log.info("MySegment will create db file at {}", dbUrl);
+        log.info("MySegment will use db file at {}", dbUrl);
         Map<String, String> map = new HashMap<>(1);
         map.put("javax.persistence.jdbc.url", dbUrl);
 
@@ -113,9 +113,6 @@ public abstract class BaseEntityService {
         emf = Persistence.createEntityManagerFactory("CRM", map);
         Thread.currentThread().setContextClassLoader(current);
         log.info("MySegment EntityManagerFactory service is open = {}", emf.isOpen());
-
-        // 预加载一个读的 EntityManager
-        // readEntityManager = emf.createEntityManager();
     }
 
     public void finishService() {
@@ -132,17 +129,13 @@ public abstract class BaseEntityService {
      */
     public void recreateEntityManagerFactory() {
         if (emf == null || !emf.isOpen()) {
-            startService();
+            log.info("MySegment service has not started yet");
         }
         Map<String, Object> properties = emf.getProperties();
         String dbUrl = StringUtils.canonicalPathName((String) properties.get("javax.persistence.jdbc.url"));
         log.info("MySegment current dbUrl is {}", dbUrl);
         String localSavePosition = StringUtils.canonicalPathName(AppSettingsState.getInstance().localSavePosition);
-        log.info("MySegment will to switch dbUrl is {}", localSavePosition);
-        if (dbUrl.contains(localSavePosition)) {
-            log.info("MySegment db file at {} have already exits", localSavePosition);
-            return;
-        }
+        log.info("MySegment will to switch dbUrl at {}", localSavePosition);
         log.info("MySegment switch EntityManagerFactory begin");
         if (emf.isOpen()) {
             finishService();
@@ -169,6 +162,7 @@ public abstract class BaseEntityService {
                     .append(localSavePosition)
                     .append("/")
                     .append(dbName)
+                    .append(";AUTO_SERVER=TRUE;")
                     .toString();
         }
         return dbUrl;
