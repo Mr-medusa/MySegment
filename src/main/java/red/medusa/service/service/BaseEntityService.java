@@ -128,22 +128,28 @@ public abstract class BaseEntityService {
         动态切换DB
      */
     public void recreateEntityManagerFactory() {
+        log.info("MySegment switch EntityManagerFactory begin");
         if (emf == null || !emf.isOpen()) {
             log.info("MySegment service has not started yet");
-        }
-        Map<String, Object> properties = emf.getProperties();
-        String dbUrl = StringUtils.canonicalPathName((String) properties.get("javax.persistence.jdbc.url"));
-        log.info("MySegment current dbUrl is {}", dbUrl);
-        String localSavePosition = StringUtils.canonicalPathName(AppSettingsState.getInstance().localSavePosition);
-        log.info("MySegment will to switch dbUrl at {}", localSavePosition);
-        log.info("MySegment switch EntityManagerFactory begin");
-        if (emf.isOpen()) {
+            startService();
+            String localSavePosition = StringUtils.canonicalPathName(AppSettingsState.getInstance().localSavePosition);
+            log.info("MySegment will to switch dbUrl at {}", localSavePosition);
+        } else {
+            serviceInfo();
             finishService();
             startService();
         }
         if (emf.isOpen())
             NotifyUtils.notifyInfo("切换数据库成功!");
         log.info("MySegment switch EntityManagerFactory end");
+    }
+
+    private void serviceInfo() {
+        Map<String, Object> properties = emf.getProperties();
+        String dbUrl = StringUtils.canonicalPathName((String) properties.get("javax.persistence.jdbc.url"));
+        log.info("MySegment current dbUrl is {}", dbUrl);
+        String localSavePosition = StringUtils.canonicalPathName(AppSettingsState.getInstance().localSavePosition);
+        log.info("MySegment will to switch dbUrl at {}", localSavePosition);
     }
 
     public String dbUrl() {
@@ -167,10 +173,11 @@ public abstract class BaseEntityService {
         return dbUrl;
     }
 
-    public boolean isClose(){
+    public boolean isClose() {
         return emf == null || !emf.isOpen();
     }
-    public boolean isOpen(){
+
+    public boolean isOpen() {
         return emf != null && emf.isOpen();
     }
 }
