@@ -162,6 +162,7 @@ public abstract class BaseEntityService {
                     .append(localSavePosition)
                     .append("/")
                     .append(dbName)
+                    .append(";AUTO_SERVER=TRUE;")
                     .toString();
         }
         return dbUrl;
