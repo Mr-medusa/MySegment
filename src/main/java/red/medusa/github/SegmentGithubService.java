@@ -20,6 +20,9 @@ import red.medusa.ui.NotifyUtils;
 import red.medusa.utils.StringUtils;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -82,8 +85,9 @@ public class SegmentGithubService {
                         checkout = checkout(trimBranchName, true);
                     }
                     log.info("checkout and current branch is: {}", checkout);
-                    SegmentEntityService.getInstance().recreateEntityManagerFactory();
                 }
+                // 每一次改变都重新连接
+                SegmentEntityService.getInstance().recreateEntityManagerFactory();
             }
         } catch (InvalidRemoteException e1) {       // clone
             NotifyUtils.notifyWarning(HELP_TITLE, "没有添加的初始化仓库配置项", HELP_URL);
@@ -362,6 +366,23 @@ public class SegmentGithubService {
         } else {
             return new LinkedHashSet<>(Collections.singleton(AppSettingsState.DEFAULT_BRANCH_NAME));
         }
+    }
+
+    public List<String> findDbFileName(){
+        List<String> list = new ArrayList<>(10);
+        try {
+            Files.walk(Paths.get(settings.localSavePosition), 1).forEach(path -> {
+                Path name = path.getName(path.getNameCount() - 1);
+                String dbName = name.toString();
+                if(dbName.endsWith(".mv.db")){
+                    String cleanName = dbName.substring(0, dbName.lastIndexOf('.', dbName.length() - 6));
+                    list.add(cleanName);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }
 
