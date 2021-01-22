@@ -1,9 +1,17 @@
 package red.medusa.service.service;
 
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import red.medusa.intellij.settings.AppSettingsState;
+import red.medusa.intellij.ui.SegmentContentType;
+import red.medusa.intellij.ui.SegmentToolWindowFactory;
+import red.medusa.intellij.utils.SegmentAppUtils;
 import red.medusa.service.entity.BaseEntity;
 import red.medusa.ui.NotifyUtils;
+import red.medusa.ui.SegmentHome;
 import red.medusa.utils.StringUtils;
 
 import javax.persistence.EntityManager;
@@ -128,20 +136,50 @@ public abstract class BaseEntityService {
         动态切换DB
      */
     public void recreateEntityManagerFactory() {
-        log.info("MySegment switch EntityManagerFactory begin");
-        if (emf == null || !emf.isOpen()) {
-            log.info("MySegment service has not started yet");
-            startService();
-            String localSavePosition = StringUtils.canonicalPathName(AppSettingsState.getInstance().localSavePosition);
-            log.info("MySegment will to switch dbUrl at {}", localSavePosition);
-        } else {
-            serviceInfo();
-            finishService();
-            startService();
-        }
-        if (emf.isOpen())
-            NotifyUtils.notifyInfo("切换数据库成功!");
-        log.info("MySegment switch EntityManagerFactory end");
+        new Task.Backgroundable(SegmentAppUtils.getProject(), "Restart segment service", false) {
+            @SneakyThrows
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+
+                log.info("MySegment switch EntityManagerFactory begin");
+                if (emf == null || !emf.isOpen()) {
+                    log.info("MySegment service has not started yet");
+                    startService();
+                    String localSavePosition = StringUtils.canonicalPathName(AppSettingsState.getInstance().localSavePosition);
+                    log.info("MySegment will to switch dbUrl at {}", localSavePosition);
+                } else {
+                    serviceInfo();
+
+                    indicator.setText("MySegment service is finishing...");
+                    indicator.setFraction(0.2);
+
+                    finishService();
+
+                    indicator.setText("MySegment service is restarting...");
+                    indicator.setFraction(0.5);
+
+                    startService();
+                }
+                if (emf.isOpen()) {
+                    indicator.setFraction(1);
+                    //  NotifyUtils.notifyInfo("切换数据库成功!");
+                }
+                log.info("MySegment switch EntityManagerFactory end");
+            }
+
+            @Override
+            public void onSuccess() {
+                ((SegmentHome) SegmentToolWindowFactory.get(SegmentContentType.SegmentHome)).refresh2();
+            }
+
+            @Override
+            public void onThrowable(@NotNull Throwable error) {
+                log.info("onThrowable");
+                NotifyUtils.notifyWarning(error.getMessage());
+                error.printStackTrace();
+            }
+        }.queue();
+
     }
 
     private void serviceInfo() {
@@ -155,6 +193,7 @@ public abstract class BaseEntityService {
     public String dbUrl() {
         String dbNamePrefix = "jdbc:h2:";
         String dbNamePostfix = "/segment";
+        String autoServer = ";AUTO_SERVER=TRUE;";
         AppSettingsState settingsState = AppSettingsState.getInstance();
         // 默认位置
         String dbUrl = settingsState.localSavePosition + dbNamePostfix;
@@ -164,11 +203,13 @@ public abstract class BaseEntityService {
         if (settingsState.isInitAvailable()) {
             String localSavePosition = StringUtils.canonicalPathName(settingsState.localSavePosition);
             String dbName = StringUtils.canonicalPathName(settingsState.dbName);
-            dbUrl = sb.append(dbNamePrefix)
+            sb.append(dbNamePrefix)
                     .append(localSavePosition)
                     .append("/")
-                    .append(dbName)
-                    .toString();
+                    .append(dbName);
+            if (settingsState.permitMultipleConnection)
+                sb.append(autoServer);
+            dbUrl = sb.toString();
         }
         return dbUrl;
     }

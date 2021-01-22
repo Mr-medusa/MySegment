@@ -21,22 +21,13 @@ import org.jetbrains.annotations.Nullable;
 )
 @Slf4j
 public class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
-    //----------------------------------------- 本地仓库配置 -------------------------------------------
-    // 默认分支名
-    public static final String DEFAULT_BRANCH_NAME = "refs/heads/master";
+
     // 数据库名字
     public volatile String dbName = "Segment";
-    public volatile String branchName = DEFAULT_BRANCH_NAME;
     // 保存的文件位置
     public String localSavePosition = System.getProperty("user.home")+"/Segment";
-    // 是否自动提交
-    public volatile boolean autoCommit = false;
-    //--------------------------------------  远程仓库配置 ----------------------------------------------
-    // github 地址
-    public volatile String githubUrl = "https://github.com";
-    // 是否使用Github作为远程仓库
-    public volatile boolean useGithub = false;
-    public volatile boolean autoPush = false;
+    // 是否能多连接
+    public volatile boolean permitMultipleConnection = true;
 
 
     public static AppSettingsState getInstance() {
@@ -58,23 +49,4 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
         return localSavePosition.trim().length() > 0 && dbName.trim().length() > 0;
     }
 
-    public boolean isCloneAvailable() {
-        return githubUrl.trim().length() > 0 &&
-                branchName.trim().length() > 0 &&
-                localSavePosition.trim().length() > 0 &&
-                dbName.trim().length() > 0;
-    }
-
-    @Override
-    public String toString() {
-        return "AppSettingsState{" +
-                "githubUrl='" + githubUrl + '\'' +
-                ", dbName='" + dbName + '\'' +
-                ", branchName='" + branchName + '\'' +
-                ", localSavePosition='" + localSavePosition + '\'' +
-                ", autoCommit=" + autoCommit +
-                ", useGithub=" + useGithub +
-                ", autoPush=" + autoPush +
-                '}';
-    }
 }

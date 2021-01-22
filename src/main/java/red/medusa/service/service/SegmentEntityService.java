@@ -12,7 +12,7 @@ import red.medusa.ui.context.SegmentContextHolder;
 @Slf4j
 public class SegmentEntityService extends BaseEntityService {
 
-    private final DebounceWorker debounceWorker = new DebounceWorker(2000);
+    private final DebounceWorker debounceWorker = new DebounceWorker(1000);
 
     public SegmentEntityService() {
     }

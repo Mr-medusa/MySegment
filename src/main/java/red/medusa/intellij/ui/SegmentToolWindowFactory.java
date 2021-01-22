@@ -1,17 +1,18 @@
 package red.medusa.intellij.ui;
 
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.*;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import red.medusa.intellij.SdkIcons;
+import red.medusa.intellij.utils.SegmentAppUtils;
 import red.medusa.service.service.SegmentEntityService;
-import red.medusa.ui.SegmentAddOrEdit;
-import red.medusa.ui.SegmentDetail;
-import red.medusa.ui.SegmentHome;
-import red.medusa.ui.SegmentModule;
+import red.medusa.ui.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,8 +51,31 @@ public class SegmentToolWindowFactory implements ToolWindowFactory {
 
         initListener(contentManager);
 
-        SegmentEntityService.getInstance().startService();
-        ((SegmentHome)map.get(SegmentContentType.SegmentHome)).refresh2();
+
+        new Task.Backgroundable(SegmentAppUtils.getProject(), "Load segment", false) {
+            @SneakyThrows
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(false);
+                indicator.setText("MySegment service is starting...");
+                indicator.setFraction(0.5);
+
+                SegmentEntityService.getInstance().startService();
+
+                indicator.setFraction(1);
+            }
+
+            @Override
+            public void onSuccess() {
+                ((SegmentHome) map.get(SegmentContentType.SegmentHome)).refresh2();
+            }
+
+            @Override
+            public void onThrowable(@NotNull Throwable error) {
+                log.info("onThrowable");
+                NotifyUtils.notifyWarning(error.getMessage());
+                error.printStackTrace();
+            }
+        }.queue();
     }
 
     public void initListener(ContentManager contentManager) {
@@ -68,6 +92,7 @@ public class SegmentToolWindowFactory implements ToolWindowFactory {
                 }
             }
         });
+
     }
 
     public static SegmentComponent get(SegmentContentType key) {

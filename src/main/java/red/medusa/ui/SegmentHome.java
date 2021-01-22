@@ -106,21 +106,6 @@ public class SegmentHome extends SegmentSwitchableBranchDialog {
     }
 
     private void initControlsEvent() {
-        // 修改值并回车有用
-        // table.getModel().addTableModelListener();
-        // 左键按下|释放/右键按下
-        //  table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-        //      @Override
-        //      public void valueChanged(ListSelectionEvent e) {
-        //          // 区分鼠标按下|释放
-        //          if (e.getValueIsAdjusting()) {
-        //              DefaultListSelectionModel source = (DefaultListSelectionModel) e.getSource();
-        //              int selectionIndex = source.getAnchorSelectionIndex();
-        //              Object valueAt = table.getModel().getValueAt(selectionIndex, 0);
-        //              System.out.println(valueAt);
-        //          }
-        //      }
-        //  });
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int row = ((JTable) e.getSource()).rowAtPoint(e.getPoint());        //获得行位置
@@ -182,15 +167,6 @@ public class SegmentHome extends SegmentSwitchableBranchDialog {
         for (Module module : modules) {
             modelComboBox.addItem(module);
         }
-//        if (modules.size() > 0) {
-//            List<Category> categories = modules.get(0).getCategories();
-//            if (!categories.isEmpty()) {
-//                for (Category category : categories) {
-//                    categoryComboBox.addItem(category);
-//                }
-//            }
-//        }
-
         SegmentContextHolder.setSegment(new Segment());
         table.refresh();
 

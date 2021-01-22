@@ -3,7 +3,6 @@ package red.medusa.ui;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import lombok.extern.slf4j.Slf4j;
-import red.medusa.github.SegmentGithubService;
 import red.medusa.intellij.settings.AppSettingsState;
 import red.medusa.intellij.ui.SegmentComponent;
 import red.medusa.service.service.SegmentEntityService;
@@ -11,8 +10,11 @@ import red.medusa.service.service.SegmentEntityService;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author huguanghui
@@ -20,7 +22,6 @@ import java.util.Set;
  */
 @Slf4j
 public abstract class SegmentSwitchableBranchDialog implements SegmentComponent {
-    private String branchName = "";
     private String dbName = "";
     private boolean isNeedSwitch;
 
@@ -60,11 +61,12 @@ public abstract class SegmentSwitchableBranchDialog implements SegmentComponent 
     public void doSwitchBranch() {
         if (this.isNeedSwitch) {
             AppSettingsState appSettingsState = AppSettingsState.getInstance();
-            if (!this.branchName.isEmpty() && !appSettingsState.branchName.equals(this.branchName))
-                appSettingsState.branchName = this.branchName;
+
             if (!this.dbName.isEmpty() && !appSettingsState.dbName.equals(this.dbName))
                 appSettingsState.dbName = this.dbName;
-            SegmentGithubService.getInstance().changeForSettings();
+
+            SegmentEntityService.getInstance().recreateEntityManagerFactory();
+
             isNeedSwitch = false;
         }
     }
@@ -75,37 +77,23 @@ public abstract class SegmentSwitchableBranchDialog implements SegmentComponent 
         public SwitchBranchDialog() {
             super(true); // use current window as parent
             init();
-            setTitle("切换分支/DB");
+            setTitle("切换DB");
             setResizable(true);
         }
 
         @Override
         protected JComponent createCenterPanel() {
             Box dialogPanel = Box.createVerticalBox();
-            ComboBox<String> comboBox = new ComboBox<>();
             ComboBox<String> dbNameComboBox = new ComboBox<>();
-            comboBox.setPreferredSize(new Dimension(300,30));
             dbNameComboBox.setPreferredSize(new Dimension(300,30));
-            Box hbox01 = Box.createHorizontalBox();
-            hbox01.add(new JLabel("分支名: "));
-            hbox01.add(comboBox);
+
             Box hbox02 = Box.createHorizontalBox();
             hbox02.add(new JLabel("文件名: "));
             hbox02.add(dbNameComboBox);
-            dialogPanel.add(hbox01);
             dialogPanel.add(hbox02);
 
             try {
-                SegmentGithubService service = SegmentGithubService.getInstance();
-                Set<String> branchNames = service.findLocalBranchNames();
-                List<String> dbNames = service.findDbFileName();
-                int i = 0;
-                for (String name : branchNames) {
-                    comboBox.addItem(name);
-                    if (appSettingsState.branchName.equals(name))
-                        comboBox.setSelectedIndex(i);
-                    i++;
-                }
+                List<String> dbNames = findDbFileName();
                 for (int j = 0; j < dbNames.size(); j++) {
                     dbNameComboBox.addItem(dbNames.get(j));
                     if (appSettingsState.dbName.equals(dbNames.get(j)))
@@ -115,15 +103,6 @@ public abstract class SegmentSwitchableBranchDialog implements SegmentComponent 
                 e.printStackTrace();
             }
 
-            comboBox.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        branchName = (String) e.getItem();
-                        isNeedSwitch = true;
-                    }
-                }
-            });
             dbNameComboBox.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
@@ -136,5 +115,20 @@ public abstract class SegmentSwitchableBranchDialog implements SegmentComponent 
             return dialogPanel;
         }
     }
-
+    public List<String> findDbFileName(){
+        List<String> list = new ArrayList<>(10);
+        try {
+            Files.walk(Paths.get(AppSettingsState.getInstance().localSavePosition), 1).forEach(path -> {
+                Path name = path.getName(path.getNameCount() - 1);
+                String dbName = name.toString();
+                if(dbName.endsWith(".mv.db")){
+                    String cleanName = dbName.substring(0, dbName.lastIndexOf('.', dbName.length() - 6));
+                    list.add(cleanName);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
