@@ -1,6 +1,7 @@
 package red.medusa.service.config;
 
 import lombok.extern.slf4j.Slf4j;
+import red.medusa.github.SegmentGithubContext;
 import red.medusa.service.entity.Segment;
 
 import javax.persistence.PrePersist;
@@ -13,13 +14,16 @@ import java.util.Date;
  */
 @Slf4j
 public class Audit {
+
     @PreUpdate
     public void setLastUpdate(Segment o) {
+        SegmentGithubContext.trueFlag();
         o.setUpdateTime(new Date());
     }
 
     @PrePersist
     public void setCreateTime(Segment o) {
+        SegmentGithubContext.trueFlag();
         o.setUpdateTime(new Date());
         o.setCreateTime(new Date());
     }

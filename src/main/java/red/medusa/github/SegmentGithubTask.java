@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import red.medusa.intellij.settings.AppSettingsState;
+import red.medusa.intellij.utils.SegmentAppUtils;
 import red.medusa.ui.NotifyUtils;
 
 /**
@@ -50,6 +51,9 @@ public class SegmentGithubTask {
 
     public void projectClosed() {
         try {
+            if(!SegmentAppUtils.closeWhenOnlyOneProject()){
+                return;
+            }
             boolean mayBeNeedPush = false;
             if (appSettingsState.autoCommit){
                 log.info("commit...");
