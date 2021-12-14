@@ -173,12 +173,6 @@ public class SegmentGithubService {
 
     // 表示是否可以push,没有改变就不用push
     public boolean commitFile() throws Exception {
-        if(!SegmentGithubContext.updateFlag()){
-            return false;
-        }
-        if(true){
-            return false;
-        }
         return this.runInSpecialClassLoader(() -> {
             Map<String, Set<String>> info = new HashMap<>();
             Set<String> addOrUpdate = new HashSet<>();

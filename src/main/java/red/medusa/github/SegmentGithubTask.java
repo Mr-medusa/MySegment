@@ -55,7 +55,8 @@ public class SegmentGithubTask {
                 return;
             }
             boolean mayBeNeedPush = false;
-            if (appSettingsState.autoCommit){
+            boolean updateFlag = SegmentGithubContext.updateFlag();
+            if (appSettingsState.autoCommit && updateFlag){
                 log.info("commit...");
                 mayBeNeedPush = githubService.commitFile();
             }
