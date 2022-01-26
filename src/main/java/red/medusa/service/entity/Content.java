@@ -26,7 +26,10 @@ public class Content extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private LangType langType = LangType.JAVA;
 
-    @Column(length = 8000)
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(columnDefinition="CLOB", nullable=true)
+    // @Column(length = 21000)
     private String content;
 
     private String title;
